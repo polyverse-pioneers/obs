@@ -96,6 +96,7 @@ Use **tcpdata.com** speedtest API (no key required, free HTTP testing tool).
 - **Download test (GET)**  
   - Endpoint: `https://tcpdata.com/speedtest?size={sizeBytes}`  
   - Behavior: server sends `sizeBytes` of data  
+    - Size source: value comes from CLI `--download-size` (default `10485760`) and is overrideable per run.
   - Measure:
     - Start stopwatch before request
     - Read and discard response stream fully
@@ -112,6 +113,8 @@ Use **tcpdata.com** speedtest API (no key required, free HTTP testing tool).
 - **Upload test (POST)**  
   - Endpoint: `https://tcpdata.com/speedtest`  
   - Behavior: client sends `sizeBytes` of data in body  
+    - Size source: value comes from CLI `--upload-size` (default `10485760`) and is overrideable per run.
+    - Validation rule for tcpdata backend: `--upload-size` must be greater than `0`.
   - Implementation:
     - Generate a buffer of zeros (or random) of requested size
     - Use `HttpClient.PostAsync` with `StreamContent` or `ByteArrayContent`
@@ -163,6 +166,11 @@ This supports:
 
 Use **System.CommandLine** or **Spectre.Console.Cli** for a rich CLI.
 
+Implementation note (approved deviation for current build):
+
+- Current Phase 4 implementation uses a deterministic manual parser in `SpeedTest.Cli/CliApp.cs` instead of System.CommandLine due package/API mismatch in the current environment.
+- Behavioral contract remains aligned to the same option set, defaults, and validation rules in this spec.
+
 ## 4.1 Top-level command
 
 Executable name: `netspeed`
@@ -193,6 +201,16 @@ For `run` command:
 - `--upload-url <url>` (optional; if omitted, skip upload)
 - `--format <json|text|prometheus>` (default: `json`)
 - `--label <key=value>` (repeatable; adds to metadata)
+
+Backend-specific validation notes:
+
+- For `backend=tcpdata`:
+    - `--download-size` must be greater than `0`.
+    - `--upload-size` must be greater than `0`.
+    - Both options are intended as per-run override values and map directly into tcpdata request behavior.
+- For `backend=custom`:
+    - `--download-size` must be greater than `0`.
+    - `--upload-size` may be `0` to allow upload skip behavior when combined with omitted `--upload-url`.
 
 Exit codes:
 

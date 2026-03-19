@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SpeedTest.Core\SpeedTest.Core.csproj" />
+    <ProjectReference Include="..\SpeedTest.Cli\SpeedTest.Cli.csproj" />
   </ItemGroup>
 
 </Project>

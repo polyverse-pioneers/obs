@@ -7,11 +7,13 @@ Progress:
 - Phase 1 completed on 2026-03-18: solution and projects scaffolded, references wired, baseline build passed with `dotnet build SpeedTest.sln -c Release`.
 - Phase 2 completed on 2026-03-18: test-first math and JSON contract tests added, core models/helpers implemented, and `dotnet test SpeedTest.Tests/SpeedTest.Tests.csproj -c Release` passed (7/7).
 - Phase 3 completed on 2026-03-18: implemented HTTP abstractions, deterministic upload stream, tcpdata/custom backends, and retry behavior with test-first backend coverage passing via `dotnet test SpeedTest.Tests/SpeedTest.Tests.csproj -c Release` (10/10).
+- Phase 4 completed on 2026-03-18: implemented CLI parsing/validation surface and entrypoint wiring, passed test-first CLI coverage via `dotnet test SpeedTest.Tests/SpeedTest.Tests.csproj -c Release` (15/15), and added full CLI help documentation at docs/cli-help.md. Approved deviation: parser implementation is currently manual in SpeedTest.Cli/CliApp.cs rather than System.CommandLine.
 
 ## 1. Scope And Decisions
 
 - Runtime: .NET 10.
 - CLI framework: System.CommandLine.
+- Approved deviation: Phase 4 CLI parser is implemented with a deterministic manual parser (`SpeedTest.Cli/CliApp.cs`) to avoid package/API mismatch in this environment.
 - Retry policy: 3 attempts on tcpdata path before fallback or error.
 - Build outputs: self-contained artifacts for linux-x64 and linux-arm64.
 - Targets: Debian 13 x64 (current WSL host) and Debian 13 arm64.
@@ -102,7 +104,7 @@ Acceptance criteria:
    - run command options and defaults.
    - backend-specific requirements.
    - invalid argument handling.
-2. Implement System.CommandLine command graph for netspeed run.
+2. Implement CLI parser for netspeed run (target framework choice is System.CommandLine; approved temporary deviation allows manual parser implementation).
 3. Map options into SpeedTestConfig.
 4. Enforce exit code mapping:
    - 0 success
@@ -114,6 +116,7 @@ Acceptance criteria:
 Acceptance criteria:
 - CLI parsing tests pass.
 - Exit code mapping is deterministic and tested.
+- Deviation is documented if parser implementation differs from the target framework choice.
 
 ## Phase 5 - Output Formatting And Error Payloads (Test First)
 
