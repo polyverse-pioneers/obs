@@ -2,7 +2,7 @@ using SpeedTest.Core;
 
 namespace SpeedTest.Cli;
 
-public sealed class CliParseResult
+public sealed class ParseResult
 {
     public int ExitCode { get; init; }
 

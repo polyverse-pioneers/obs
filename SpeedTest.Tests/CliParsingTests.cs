@@ -7,7 +7,7 @@ public sealed class CliParsingTests
     [Fact]
     public void ParseRunCommand_UsesExpectedDefaults()
     {
-        var result = CliApp.Parse(new[] { "run" });
+        var result = App.Parse(new[] { "run" });
 
         Assert.Equal(0, result.ExitCode);
         Assert.NotNull(result.Config);
@@ -24,7 +24,7 @@ public sealed class CliParsingTests
     [Fact]
     public void ParseRunCommand_ReturnsCliError_ForUnknownBackend()
     {
-        var result = CliApp.Parse(new[] { "run", "--backend", "bogus" });
+        var result = App.Parse(new[] { "run", "--backend", "bogus" });
 
         Assert.Equal(1, result.ExitCode);
         Assert.Contains("backend", result.Error ?? string.Empty, StringComparison.OrdinalIgnoreCase);
@@ -33,7 +33,7 @@ public sealed class CliParsingTests
     [Fact]
     public void ParseRunCommand_RequiresDownloadUrl_ForCustomBackend()
     {
-        var result = CliApp.Parse(new[] { "run", "--backend", "custom" });
+        var result = App.Parse(new[] { "run", "--backend", "custom" });
 
         Assert.Equal(1, result.ExitCode);
         Assert.Contains("download-url", result.Error ?? string.Empty, StringComparison.OrdinalIgnoreCase);
@@ -42,7 +42,7 @@ public sealed class CliParsingTests
     [Fact]
     public void ParseRunCommand_AllowsMissingUploadUrl_ForCustomBackend()
     {
-        var result = CliApp.Parse(new[]
+        var result = App.Parse(new[]
         {
             "run",
             "--backend", "custom",
@@ -59,7 +59,7 @@ public sealed class CliParsingTests
     [Fact]
     public void ParseRunCommand_ParsesRepeatableLabels_IntoMetadata()
     {
-        var result = CliApp.Parse(new[]
+        var result = App.Parse(new[]
         {
             "run",
             "--label", "host=planck",
@@ -76,7 +76,7 @@ public sealed class CliParsingTests
     [Fact]
     public void ParseRunCommand_AcceptsTcpDataSizeOverrides()
     {
-        var result = CliApp.Parse(new[]
+        var result = App.Parse(new[]
         {
             "run",
             "--backend", "tcpdata",
@@ -93,7 +93,7 @@ public sealed class CliParsingTests
     [Fact]
     public void ParseRunCommand_RejectsNonPositiveUploadSize_ForTcpData()
     {
-        var result = CliApp.Parse(new[]
+        var result = App.Parse(new[]
         {
             "run",
             "--backend", "tcpdata",

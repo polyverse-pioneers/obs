@@ -168,7 +168,7 @@ Use **System.CommandLine** or **Spectre.Console.Cli** for a rich CLI.
 
 Implementation note (approved deviation for current build):
 
-- Current Phase 4 implementation uses a deterministic manual parser in `SpeedTest.Cli/CliApp.cs` instead of System.CommandLine due package/API mismatch in the current environment.
+- Current Phase 4 implementation uses a deterministic manual parser in `SpeedTest.Cli/App.cs` instead of System.CommandLine due package/API mismatch in the current environment.
 - Behavioral contract remains aligned to the same option set, defaults, and validation rules in this spec.
 
 ## 4.1 Top-level command
@@ -218,6 +218,30 @@ Exit codes:
 - `1` = CLI/argument error
 - `2` = network/HTTP error
 - `3` = internal error
+
+## 4.3 Validation Architecture Decision
+
+Validation logic should evolve from ad-hoc `if` chains toward a small composable validator pipeline (fluent-style rule composition) inside the CLI layer.
+
+Decision and reasoning for current scope:
+
+- Use an in-repo validator abstraction first (no additional package dependency).
+- Keep parser and validation separated so validation rules are unit-testable in isolation.
+- Split rules into:
+    - common rules (sizes, timeout, format, label syntax)
+    - backend-specific rules (`tcpdata`, `custom`)
+
+Why not add a package right now:
+
+- Repo priority explicitly favors minimizing dependencies and keeping changes small.
+- Current rule set is still compact and localized to CLI parsing.
+- Native AOT-friendly behavior is easier to reason about with explicit in-repo code paths.
+
+When to revisit package adoption:
+
+- If validation rules grow significantly or become duplicated across multiple layers.
+- If richer features (rule reuse across modules, localization, advanced conditional rules) outweigh dependency cost.
+- If team standardization across services requires a shared validation framework.
 
 ---
 
