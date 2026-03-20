@@ -22,7 +22,7 @@ public static class ResultFormatter
             : $"Error: {message}";
 
     private static string FormatJson(SpeedTestResult result) =>
-        JsonSerializer.Serialize(result);
+        JsonSerializer.Serialize(result, SpeedTestJsonContext.Default.SpeedTestResult);
 
     private static string FormatText(SpeedTestResult result)
     {
@@ -73,15 +73,15 @@ public static class ResultFormatter
             Error = message,
             Timestamp = DateTimeOffset.UtcNow
         };
-        return JsonSerializer.Serialize(payload);
+        return JsonSerializer.Serialize(payload, SpeedTestJsonContext.Default.ErrorPayload);
     }
+}
 
-    private sealed class ErrorPayload
-    {
-        [JsonPropertyName("error")]
-        public string Error { get; init; } = string.Empty;
+internal sealed class ErrorPayload
+{
+    [JsonPropertyName("error")]
+    public string Error { get; init; } = string.Empty;
 
-        [JsonPropertyName("timestamp")]
-        public DateTimeOffset Timestamp { get; init; }
-    }
+    [JsonPropertyName("timestamp")]
+    public DateTimeOffset Timestamp { get; init; }
 }
