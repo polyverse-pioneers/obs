@@ -59,6 +59,8 @@ public sealed class TcpDataBackendTests
         Assert.Equal(16, result.Download.BytesTransferred);
         Assert.Equal(8, result.Upload.BytesTransferred);
         Assert.Equal("lab", result.Metadata!["label_region"]);
+        Assert.True(result.Download.Duration >= result.Download.TimeToFirstByte);
+        Assert.True(result.Download.Duration >= result.Download.TransferDuration);
 
         Assert.Equal(4, handler.Requests.Count);
     }

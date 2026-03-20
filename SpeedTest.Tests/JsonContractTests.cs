@@ -57,6 +57,8 @@ public sealed class JsonContractTests
         Assert.Contains("\"mbps\":215.3", json);
         Assert.Contains("\"bytes\":10485760", json);
         Assert.Contains("\"duration_ms\":388", json);
+        Assert.Contains("\"time_to_first_byte_ms\":0", json);
+        Assert.Contains("\"transfer_duration_ms\":0", json);
 
         Assert.Contains("\"upload\":", json);
         Assert.Contains("\"duration_ms\":4475", json);

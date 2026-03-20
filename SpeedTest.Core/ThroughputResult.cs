@@ -13,4 +13,12 @@ public sealed class ThroughputResult
     [JsonPropertyName("duration_ms")]
     [JsonConverter(typeof(MillisecondsTimeSpanConverter))]
     public TimeSpan Duration { get; init; }
+
+    [JsonPropertyName("time_to_first_byte_ms")]
+    [JsonConverter(typeof(MillisecondsTimeSpanConverter))]
+    public TimeSpan TimeToFirstByte { get; init; }
+
+    [JsonPropertyName("transfer_duration_ms")]
+    [JsonConverter(typeof(MillisecondsTimeSpanConverter))]
+    public TimeSpan TransferDuration { get; init; }
 }

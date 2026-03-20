@@ -10,6 +10,9 @@ Progress:
 - Phase 4 completed on 2026-03-18: implemented CLI parsing/validation surface and entrypoint wiring, passed test-first CLI coverage via `dotnet test SpeedTest.Tests/SpeedTest.Tests.csproj -c Release` (15/15), and added full CLI help documentation at docs/cli-help.md. Approved deviation: parser implementation is currently manual in SpeedTest.Cli/App.cs rather than System.CommandLine.
 - Post-Phase-4 refactor completed on 2026-03-18: CLI validation refactored into a fluent-style validator pipeline (`ValidationBuilder`/`Validator`/`ValidationRules`) with dedicated validator unit tests added and passing.
 - Phase 5 completed on 2026-03-19: implemented `ResultFormatter` in `SpeedTest.Core` (json/text/prometheus output + JSON error payload); wired `Program.cs` to instantiate backends, call `RunAsync`, format output, and map exceptions to exit codes 2/3. 18 new output formatter tests added; total 40/40 passing.- Phase 6 completed on 2026-03-19: quality gates passed (40/40 tests, clean Release build). Published self-contained artifacts to `publish/linux-x64/pip-speed` (77K) and `publish/linux-arm64/pip-speed` (76K). linux-x64 smoke check: binary executes, CLI validation paths and exit codes verified. linux-arm64 artifact confirmed as ELF aarch64 with correct layout.
+- Phase 5 completed on 2026-03-19: implemented `ResultFormatter` in `SpeedTest.Core` (json/text/prometheus output + JSON error payload); wired `Program.cs` to instantiate backends, call `RunAsync`, format output, and map exceptions to exit codes 2/3. 18 new output formatter tests added; total 40/40 passing.
+- Phase 6 completed on 2026-03-19: quality gates passed (40/40 tests, clean Release build). Published self-contained artifacts to `publish/linux-x64/pip-speed` (77K) and `publish/linux-arm64/pip-speed` (76K). linux-x64 smoke check: binary executes, CLI validation paths and exit codes verified. linux-arm64 artifact confirmed as ELF aarch64 with correct layout.
+- Phase 7 in progress on 2026-03-20: add split download timing to isolate ISP path effects. New download timing contract records (1) time-to-first-byte/headers and (2) payload transfer duration, while preserving existing total duration and Mbps output. JSON and Prometheus outputs gain download timing breakdown metrics.
 ## 1. Scope And Decisions
 
 - Runtime: .NET 10.
@@ -148,6 +151,26 @@ Acceptance criteria:
 - Tests are green.
 - Both self-contained artifacts are produced successfully.
 - Smoke checks documented.
+
+## Phase 7 - Split Download Timing (Test First)
+
+1. Add failing tests for download timing breakdown fields:
+   - total download duration remains populated
+   - time-to-first-byte is captured
+   - transfer duration is captured
+2. Update core model contract:
+   - extend `ThroughputResult` with `TimeToFirstByte` and `TransferDuration`
+3. Update backends:
+   - `TcpDataBackend` download path records separate timing phases
+   - `CustomHttpBackend` download path records separate timing phases
+4. Update output surfaces:
+   - JSON includes `time_to_first_byte_ms` and `transfer_duration_ms` for download
+   - Prometheus output includes `netspeed_download_ttfb_ms` and `netspeed_download_transfer_ms`
+
+Acceptance criteria:
+- New tests pass and existing tests remain green.
+- Existing fields remain backward-compatible.
+- Output includes new split download timing fields/metrics.
 
 ## 4. Test Matrix
 

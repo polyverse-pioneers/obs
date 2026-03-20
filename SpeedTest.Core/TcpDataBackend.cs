@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Diagnostics;
 
 namespace SpeedTest.Core;
 
@@ -63,30 +64,35 @@ public sealed class TcpDataBackend : ISpeedTestBackend
     {
         var url = $"{BaseUrl}?size={config.DownloadSizeBytes}";
 
-        var (duration, bytes) = await Timing.MeasureAsync(async () =>
+        var totalStopwatch = Stopwatch.StartNew();
+        using var req = new HttpRequestMessage(HttpMethod.Get, url);
+        using var resp = await _http.Client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
+        resp.EnsureSuccessStatusCode();
+        var timeToFirstByte = totalStopwatch.Elapsed;
+
+        await using var stream = await resp.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
+        var transferStopwatch = Stopwatch.StartNew();
+        var buffer = new byte[64 * 1024];
+        long bytes = 0;
+
+        int read;
+        while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), ct).ConfigureAwait(false)) > 0)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, url);
-            using var resp = await _http.Client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
-            resp.EnsureSuccessStatusCode();
+            bytes += read;
+        }
 
-            await using var stream = await resp.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
-            var buffer = new byte[64 * 1024];
-            long total = 0;
-
-            int read;
-            while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), ct).ConfigureAwait(false)) > 0)
-            {
-                total += read;
-            }
-
-            return total;
-        }).ConfigureAwait(false);
+        transferStopwatch.Stop();
+        totalStopwatch.Stop();
+        var duration = totalStopwatch.Elapsed;
+        var transferDuration = transferStopwatch.Elapsed;
 
         return new ThroughputResult
         {
             Mbps = Throughput.CalculateMbps(bytes, duration),
             BytesTransferred = bytes,
-            Duration = duration
+            Duration = duration,
+            TimeToFirstByte = timeToFirstByte,
+            TransferDuration = transferDuration
         };
     }
 

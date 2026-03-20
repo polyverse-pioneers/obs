@@ -40,6 +40,8 @@ public sealed class CustomHttpBackendTests
         Assert.Equal("custom", result.Backend);
         Assert.Equal(24, result.Download.BytesTransferred);
         Assert.Equal(0, result.Upload.BytesTransferred);
+        Assert.True(result.Download.Duration >= result.Download.TimeToFirstByte);
+        Assert.True(result.Download.Duration >= result.Download.TransferDuration);
 
         Assert.Single(handler.Requests);
         Assert.Equal(HttpMethod.Get, handler.Requests[0].Method);

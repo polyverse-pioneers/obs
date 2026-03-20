@@ -75,6 +75,8 @@ In `SpeedTest.Core`:
   - `double Mbps`
   - `long BytesTransferred`
   - `TimeSpan Duration`
+    - `TimeSpan TimeToFirstByte`
+    - `TimeSpan TransferDuration`
 
 - **`ISpeedTestBackend`**
   - `Task<SpeedTestResult> RunAsync(SpeedTestConfig config, CancellationToken ct)`
@@ -98,9 +100,10 @@ Use **tcpdata.com** speedtest API (no key required, free HTTP testing tool).
   - Behavior: server sends `sizeBytes` of data  
     - Size source: value comes from CLI `--download-size` (default `10485760`) and is overrideable per run.
   - Measure:
-    - Start stopwatch before request
-    - Read and discard response stream fully
-    - Stop stopwatch after completion
+        - Start stopwatch before request
+        - Record **time to first byte / headers** at response header receipt
+        - Measure **transfer duration** while reading the response stream fully
+        - Keep existing total duration for backward compatibility
     - Compute Mbps:  
       
 
@@ -266,7 +269,9 @@ JSON schema (single object):
   "download": {
     "mbps": 215.3,
     "bytes": 10485760,
-    "duration_ms": 388.0
+        "duration_ms": 388.0,
+        "time_to_first_byte_ms": 34.2,
+        "transfer_duration_ms": 353.8
   },
   "upload": {
     "mbps": 18.7,
@@ -324,6 +329,8 @@ netspeed_latency_ms_min 20.1
 netspeed_latency_ms_max 30.7
 netspeed_latency_ms_jitter 3.2
 netspeed_download_mbps 215.3
+netspeed_download_ttfb_ms 34.2
+netspeed_download_transfer_ms 353.8
 netspeed_upload_mbps 18.7
 ```
 

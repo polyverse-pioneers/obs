@@ -42,8 +42,12 @@ public static class ResultFormatter
 
         var downloadMib = result.Download.BytesTransferred / (1024.0 * 1024.0);
         var downloadMs = (long)result.Download.Duration.TotalMilliseconds;
+        var downloadTtfbMs = (long)result.Download.TimeToFirstByte.TotalMilliseconds;
+        var downloadTransferMs = (long)result.Download.TransferDuration.TotalMilliseconds;
         sb.AppendLine("Download:");
         sb.AppendLine(CultureInfo.InvariantCulture, $"  {result.Download.Mbps:G} Mbps ({downloadMib:0.0} MiB in {downloadMs} ms)");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"  Time to first byte: {downloadTtfbMs} ms");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"  Transfer duration: {downloadTransferMs} ms");
         sb.AppendLine();
 
         var uploadMib = result.Upload.BytesTransferred / (1024.0 * 1024.0);
@@ -62,6 +66,8 @@ public static class ResultFormatter
         sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_max {result.Latency.MaxMs:G}");
         sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_jitter {result.Latency.JitterMs:G}");
         sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_mbps {result.Download.Mbps:G}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_ttfb_ms {result.Download.TimeToFirstByte.TotalMilliseconds:G}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_transfer_ms {result.Download.TransferDuration.TotalMilliseconds:G}");
         sb.Append(CultureInfo.InvariantCulture, $"netspeed_upload_mbps {result.Upload.Mbps:G}");
         return sb.ToString();
     }

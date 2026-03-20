@@ -22,7 +22,9 @@ public sealed class OutputFormatterTests
         {
             Mbps = 215.3,
             BytesTransferred = 10_485_760,
-            Duration = TimeSpan.FromMilliseconds(388)
+            Duration = TimeSpan.FromMilliseconds(388),
+            TimeToFirstByte = TimeSpan.FromMilliseconds(34),
+            TransferDuration = TimeSpan.FromMilliseconds(354)
         },
         Upload = new ThroughputResult
         {
@@ -136,6 +138,8 @@ public sealed class OutputFormatterTests
         Assert.Contains("215.3 Mbps", output);
         Assert.Contains("10.0 MiB", output);
         Assert.Contains("388 ms", output);
+        Assert.Contains("Time to first byte: 34 ms", output);
+        Assert.Contains("Transfer duration: 354 ms", output);
     }
 
     [Fact]
@@ -164,6 +168,8 @@ public sealed class OutputFormatterTests
     {
         var output = ResultFormatter.Format(SampleResult, "prometheus");
         Assert.Contains("netspeed_download_mbps 215.3", output);
+        Assert.Contains("netspeed_download_ttfb_ms 34", output);
+        Assert.Contains("netspeed_download_transfer_ms 354", output);
         Assert.Contains("netspeed_upload_mbps 18.7", output);
     }
 
