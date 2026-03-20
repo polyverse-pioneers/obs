@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ---------------------------------------------
+# Configuration
+# ---------------------------------------------
+TARGET_HOST="planck-primary"
+TARGET_DIR="/opt/pip-speed"
+PUBLISH_DIR="publish/linux-arm64"
+BINARY="$PUBLISH_DIR/pip-speed"
+
+# ---------------------------------------------
+# Validate binary exists
+# ---------------------------------------------
+if [[ ! -f "$BINARY" ]]; then
+    echo "ERROR: pip-speed binary not found at: $BINARY"
+    exit 1
+fi
+
+echo "==> Deploying pip-speed to $TARGET_HOST:$TARGET_DIR"
+
+# ---------------------------------------------
+# Copy binary to remote /tmp
+# ---------------------------------------------
+scp "$BINARY" "$TARGET_HOST:/tmp/pip-speed"
+
+# ---------------------------------------------
+# Move into place on remote host
+# ---------------------------------------------
+ssh "$TARGET_HOST" << EOF
+set -euo pipefail
+
+# Ensure target directory exists
+sudo mkdir -p "$TARGET_DIR"
+
+# Move binary into place
+sudo mv /tmp/pip-speed "$TARGET_DIR/pip-speed"
+
+# Ensure executable
+sudo chmod 755 "$TARGET_DIR/pip-speed"
+
+echo "pip-speed installed at $TARGET_DIR/pip-speed"
+EOF
+
+echo "==> Deployment complete."
