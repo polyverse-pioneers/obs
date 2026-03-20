@@ -1,8 +1,8 @@
-# Netspeed CLI Help
+# pip-speed CLI Help
 
 ## Overview
 
-Netspeed is a deterministic network speed test CLI for download, upload, and latency metrics.
+pip-speed is a deterministic network speed test CLI for download, upload, and latency metrics.
 
 Current command set:
 - run
@@ -10,7 +10,7 @@ Current command set:
 ## Usage
 
 ```text
-netspeed run [options]
+pip-speed run [options]
 ```
 
 ## Run Command Options
@@ -58,23 +58,23 @@ netspeed run [options]
 ## Examples
 
 ```bash
-netspeed run
+pip-speed run
 ```
 
 ```bash
-netspeed run --backend tcpdata --format json
+pip-speed run --backend tcpdata --format json
 ```
 
 ```bash
-netspeed run --backend custom --download-url https://example.test/download --format text
+pip-speed run --backend custom --download-url https://example.test/download --format text
 ```
 
 ```bash
-netspeed run --backend custom --download-url https://example.test/download --upload-url https://example.test/upload --upload-size 5242880 --format prometheus
+pip-speed run --backend custom --download-url https://example.test/download --upload-url https://example.test/upload --upload-size 5242880 --format prometheus
 ```
 
 ```bash
-netspeed run --label host=planck --label region=home
+pip-speed run --label host=planck --label region=home
 ```
 
 ## Exit Codes
