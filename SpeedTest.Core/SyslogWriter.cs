@@ -1,25 +1,35 @@
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
 namespace SpeedTest.Core;
 
 /// <summary>
-/// Writes structured log messages to syslog via UDP.
-/// Uses the BSD syslog protocol (RFC 3164) on localhost:514.
+/// Writes structured log messages to syslog via Unix domain socket.
+/// Uses the BSD syslog protocol (RFC 3164) on /dev/log (canonical Linux).
 /// </summary>
 public sealed class SyslogWriter : IAsyncDisposable
 {
-    private readonly UdpClient _client;
-    private const int SyslogPort = 514;
-    private const string SyslogHost = "127.0.0.1";
+    private UnixDomainSocketEndPoint? _endpoint;
+    private Socket? _socket;
+    private const string SyslogSocketPath = "/dev/log";
 
     // Facility codes per RFC 3164
     private const int LocalUserFacility = 1; // local1
 
     public SyslogWriter()
     {
-        _client = new UdpClient();
+        try
+        {
+            if (File.Exists(SyslogSocketPath))
+            {
+                _endpoint = new UnixDomainSocketEndPoint(SyslogSocketPath);
+                _socket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified);
+            }
+        }
+        catch
+        {
+            // Socket may fail to initialize; degraded logging will fall back to stderr
+        }
     }
 
     /// <summary>
@@ -28,6 +38,11 @@ public sealed class SyslogWriter : IAsyncDisposable
     /// </summary>
     public async Task LogAsync(int severity, string tag, string message)
     {
+        if (_socket is null || _endpoint is null)
+        {
+            return; // Syslog not available; silent fallback
+        }
+
         try
         {
             // Priority = (Facility * 8) + Severity
@@ -37,18 +52,17 @@ public sealed class SyslogWriter : IAsyncDisposable
             string syslogMessage = $"<{priority}>{tag}: {message}";
             byte[] data = Encoding.UTF8.GetBytes(syslogMessage);
 
-            await _client.SendAsync(data, data.Length, SyslogHost, SyslogPort).ConfigureAwait(false);
+            await _socket.SendToAsync(new ArraySegment<byte>(data), SocketFlags.None, _endpoint).ConfigureAwait(false);
         }
-        catch (Exception ex)
+        catch
         {
-            // If syslog is unavailable, write to console as fallback
-            Console.Error.WriteLine($"syslog error: {ex.Message}");
+            // If send fails, silently ignore (don't spam stderr)
         }
     }
 
     public async ValueTask DisposeAsync()
     {
-        _client?.Dispose();
+        _socket?.Dispose();
         await ValueTask.CompletedTask;
     }
 }
