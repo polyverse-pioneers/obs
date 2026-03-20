@@ -305,6 +305,50 @@ Notes:
 - CLI auto-populates `metadata.run_mode` as `warm` when `--warmup-request` is enabled, otherwise `cold`.
 - Prometheus output includes metadata as metric labels, so warm/cold filtering can be done with selectors like `{run_mode="warm"}`.
 
+### 5.1.1 Rate-safe Telegraf wrapper strategy
+
+For tcpdata `/speedtest`, request budgeting must account for the burst generated during a single wrapper invocation, not the average across the full Telegraf interval.
+
+Per run request count:
+
+- cold run: `latency_samples + 2`
+- warm run: `latency_samples + 3`
+- cold + warm pair: `2 * latency_samples + 5`
+
+Approved operational strategy for the 15-minute Telegraf schedule:
+
+- Run exactly one download size profile per 15-minute interval.
+- For that selected profile, run both:
+    - cold measurement
+    - warm measurement (`--warmup-request`)
+- Reduce `--latency-samples` to `5` for wrapper-driven telemetry collection.
+- Emit metadata labels for each invocation:
+    - `run_mode=cold|warm`
+    - `size_profile=small|medium|large`
+    - `download_size=<bytes>`
+
+Default rotating size profiles:
+
+- `small`: `1048576` bytes
+- `medium`: `5242880` bytes
+- `large`: `10485760` bytes
+
+Constraint:
+
+- tcpdata documents a maximum download `size` of `10MB` on `/speedtest`, so wrapper-managed download profiles must not exceed `10485760` bytes.
+
+Rotation behavior:
+
+- The Telegraf wrapper rotates profiles by 15-minute UTC slot.
+- Slot 0 uses `small`, slot 1 uses `medium`, slot 2 uses `large`, then repeats.
+- This yields one full size-profile cycle every 45 minutes while keeping the burst under the tcpdata request limit.
+
+Grafana guidance:
+
+- Chart download/TTFB series grouped by `size_profile` and `run_mode`.
+- Compute warmup benefit deltas per `size_profile`, not across all profiles combined.
+- Use run-health metrics to show missing or failed runs separately from performance panels.
+
 ## 5.2 Text (human-readable)
 
 ```text
