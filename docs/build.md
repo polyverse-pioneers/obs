@@ -314,6 +314,8 @@ Latency:
 
 Download:
   215.3 Mbps (10.0 MiB in 388 ms)
+    Time to first byte: 34 ms
+    Transfer duration: 354 ms
 
 Upload:
   18.7 Mbps (10.0 MiB in 4475 ms)
@@ -333,6 +335,27 @@ netspeed_download_ttfb_ms 34.2
 netspeed_download_transfer_ms 353.8
 netspeed_upload_mbps 18.7
 ```
+
+### 5.3.1 Run health metrics (for failure charting)
+
+To make failures visible in Grafana (instead of only seeing missing performance points), the Telegraf wrapper should always emit two status metrics:
+
+```text
+netspeed_run_success 1
+netspeed_run_exit_code 0
+```
+
+On failure, emit:
+
+```text
+netspeed_run_success 0
+netspeed_run_exit_code <1|2|3>
+```
+
+Notes:
+
+- Wrapper should exit `0` after printing status metrics so Telegraf can ingest failure state as metrics.
+- Keep performance metrics and run health metrics on the same dashboard time range, but use a separate "Run Health" row/panels to avoid visual clutter in throughput/latency charts.
 
 # 6. Implementation details (.NET 10, linux-arm64, AOT‑friendly)
 
@@ -378,6 +401,8 @@ This section defines the deterministic, AOT‑friendly implementation of the spe
         public double Mbps { get; init; }
         public long BytesTransferred { get; init; }
         public TimeSpan Duration { get; init; }
+        public TimeSpan TimeToFirstByte { get; init; }
+        public TimeSpan TransferDuration { get; init; }
     }
 
     public sealed class SpeedTestResult

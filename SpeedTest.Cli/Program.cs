@@ -38,8 +38,9 @@ public static class Program
         try
         {
             var result = await backend.RunAsync(config, CancellationToken.None).ConfigureAwait(false);
-            Console.WriteLine(ResultFormatter.Format(result, format));
-            
+            var formattedResult = ResultFormatter.Format(result, format);
+            Console.WriteLine(formattedResult);
+
             // Log successful execution
             await syslog.LogAsync(6, "pip-speed", $"end: exit code 0 (success)").ConfigureAwait(false);
             return 0;
