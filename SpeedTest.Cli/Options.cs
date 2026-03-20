@@ -16,6 +16,8 @@ public sealed class Options
 
     public int TimeoutSeconds { get; set; } = 30;
 
+    public bool WarmupRequest { get; set; }
+
     public Uri? DownloadUrl { get; set; }
 
     public Uri? UploadUrl { get; set; }

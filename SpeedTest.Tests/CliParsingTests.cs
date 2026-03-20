@@ -18,7 +18,33 @@ public sealed class CliParsingTests
         Assert.Equal(10, result.Config.LatencySamples);
         Assert.Equal(1, result.Config.Concurrency);
         Assert.Equal(TimeSpan.FromSeconds(30), result.Config.Timeout);
+        Assert.False(result.Config.WarmupRequest);
         Assert.Equal("json", result.Format);
+    }
+
+    [Fact]
+    public void ParseRunCommand_SetsWarmupRequest_WhenSwitchProvided()
+    {
+        var result = App.Parse(new[]
+        {
+            "run",
+            "--warmup-request"
+        });
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.NotNull(result.Config);
+        Assert.True(result.Config!.WarmupRequest);
+        Assert.Equal("warm", result.Config.Metadata["run_mode"]);
+    }
+
+    [Fact]
+    public void ParseRunCommand_SetsRunModeToCold_WhenWarmupSwitchNotProvided()
+    {
+        var result = App.Parse(new[] { "run" });
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.NotNull(result.Config);
+        Assert.Equal("cold", result.Config!.Metadata["run_mode"]);
     }
 
     [Fact]

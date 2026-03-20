@@ -17,6 +17,11 @@ public sealed class TcpDataBackend : ISpeedTestBackend
 
     public async Task<SpeedTestResult> RunAsync(SpeedTestConfig config, CancellationToken ct)
     {
+        if (config.WarmupRequest)
+        {
+            await WarmupAsync($"{BaseUrl}?size=1", ct).ConfigureAwait(false);
+        }
+
         var latency = await MeasureLatencyAsync(config, ct).ConfigureAwait(false);
         var download = await MeasureDownloadAsync(config, ct).ConfigureAwait(false);
         var upload = await MeasureUploadAsync(config, ct).ConfigureAwait(false);
@@ -94,6 +99,13 @@ public sealed class TcpDataBackend : ISpeedTestBackend
             TimeToFirstByte = timeToFirstByte,
             TransferDuration = transferDuration
         };
+    }
+
+    private async Task WarmupAsync(string url, CancellationToken ct)
+    {
+        using var req = new HttpRequestMessage(HttpMethod.Get, url);
+        using var resp = await _http.Client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
+        resp.EnsureSuccessStatusCode();
     }
 
     private async Task<ThroughputResult> MeasureUploadAsync(SpeedTestConfig config, CancellationToken ct)

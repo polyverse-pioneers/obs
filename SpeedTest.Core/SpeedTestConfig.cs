@@ -18,5 +18,7 @@ public sealed class SpeedTestConfig
 
     public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(30);
 
+    public bool WarmupRequest { get; init; }
+
     public Dictionary<string, string> Metadata { get; init; } = new();
 }

@@ -200,6 +200,7 @@ For `run` command:
 - `--latency-samples <int>` (default: `10`)
 - `--concurrency <int>` (default: `1`, for future multi-stream)
 - `--timeout <seconds>` (default: `30`)
+- `--warmup-request` (optional boolean switch; runs one unmeasured pre-flight request before timing)
 - `--download-url <url>` (required if `backend=custom` and no default)
 - `--upload-url <url>` (optional; if omitted, skip upload)
 - `--format <json|text|prometheus>` (default: `json`)
@@ -281,7 +282,8 @@ JSON schema (single object):
   "metadata": {
     "host": "planck",
     "isp": "example-isp",
-    "label_region": "home"
+        "label_region": "home",
+        "run_mode": "warm"
   }
 }
 ```
@@ -298,6 +300,10 @@ Telegraf inputs.exec config example:
   tag_keys = ["backend", "endpoint", "metadata.host", "metadata.label_region"]
   json_string_fields = ["backend", "endpoint"]
 ```
+
+Notes:
+- CLI auto-populates `metadata.run_mode` as `warm` when `--warmup-request` is enabled, otherwise `cold`.
+- Prometheus output includes metadata as metric labels, so warm/cold filtering can be done with selectors like `{run_mode="warm"}`.
 
 ## 5.2 Text (human-readable)
 

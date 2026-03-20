@@ -157,20 +157,20 @@ public sealed class OutputFormatterTests
     public void Format_Prometheus_ContainsLatencyMetrics()
     {
         var output = ResultFormatter.Format(SampleResult, "prometheus");
-        Assert.Contains("netspeed_latency_ms_avg 23.4", output);
-        Assert.Contains("netspeed_latency_ms_min 20.1", output);
-        Assert.Contains("netspeed_latency_ms_max 30.7", output);
-        Assert.Contains("netspeed_latency_ms_jitter 3.2", output);
+        Assert.Contains("netspeed_latency_ms_avg{host=\"planck\",label_region=\"home\"} 23.4", output);
+        Assert.Contains("netspeed_latency_ms_min{host=\"planck\",label_region=\"home\"} 20.1", output);
+        Assert.Contains("netspeed_latency_ms_max{host=\"planck\",label_region=\"home\"} 30.7", output);
+        Assert.Contains("netspeed_latency_ms_jitter{host=\"planck\",label_region=\"home\"} 3.2", output);
     }
 
     [Fact]
     public void Format_Prometheus_ContainsThroughputMetrics()
     {
         var output = ResultFormatter.Format(SampleResult, "prometheus");
-        Assert.Contains("netspeed_download_mbps 215.3", output);
-        Assert.Contains("netspeed_download_ttfb_ms 34", output);
-        Assert.Contains("netspeed_download_transfer_ms 354", output);
-        Assert.Contains("netspeed_upload_mbps 18.7", output);
+        Assert.Contains("netspeed_download_mbps{host=\"planck\",label_region=\"home\"} 215.3", output);
+        Assert.Contains("netspeed_download_ttfb_ms{host=\"planck\",label_region=\"home\"} 34", output);
+        Assert.Contains("netspeed_download_transfer_ms{host=\"planck\",label_region=\"home\"} 354", output);
+        Assert.Contains("netspeed_upload_mbps{host=\"planck\",label_region=\"home\"} 18.7", output);
     }
 
     [Fact]
@@ -179,7 +179,26 @@ public sealed class OutputFormatterTests
         var output = ResultFormatter.Format(SampleResult, "prometheus");
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         Assert.True(lines.Length >= 6);
-        Assert.All(lines, line => Assert.Matches(@"^netspeed_\w+ \S+$", line.Trim()));
+        Assert.All(lines, line => Assert.Matches(@"^netspeed_\w+(\{.*\})? \S+$", line.Trim()));
+    }
+
+    [Fact]
+    public void Format_Prometheus_EscapesAndSanitizesMetadataLabels()
+    {
+        var result = new SpeedTestResult
+        {
+            Latency = new LatencyResult(),
+            Download = new ThroughputResult(),
+            Upload = new ThroughputResult(),
+            Metadata = new Dictionary<string, string>
+            {
+                ["9-probe"] = "line\n\"a\""
+            }
+        };
+
+        var output = ResultFormatter.Format(result, "prometheus");
+
+        Assert.Contains("label_9_probe=\"line\\n\\\"a\\\"\"", output);
     }
 
     // --- Error payload ---

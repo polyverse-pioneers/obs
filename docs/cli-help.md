@@ -40,6 +40,10 @@ pip-speed run [options]
 : Per-request timeout in seconds.
 : Default: 30.
 
+- --warmup-request
+: Optional pre-flight GET to warm DNS/TLS/connection setup before measured requests.
+: Default: off.
+
 - --download-url <url>
 : Required when backend is custom.
 
@@ -55,6 +59,11 @@ pip-speed run [options]
 : Repeatable metadata label.
 : Example: --label host=planck --label region=home.
 
+Automatic metadata:
+- metadata.run_mode is always added by the CLI:
+: warm when --warmup-request is used, otherwise cold.
+: Use this label to split series in Prometheus/Grafana.
+
 ## Examples
 
 ```bash
@@ -63,6 +72,10 @@ pip-speed run
 
 ```bash
 pip-speed run --backend tcpdata --format json
+```
+
+```bash
+pip-speed run --warmup-request --format prometheus
 ```
 
 ```bash

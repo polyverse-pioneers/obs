@@ -46,4 +46,38 @@ public sealed class CustomHttpBackendTests
         Assert.Single(handler.Requests);
         Assert.Equal(HttpMethod.Get, handler.Requests[0].Method);
     }
+
+    [Fact]
+    public async Task RunAsync_PerformsWarmupRequest_WhenEnabled()
+    {
+        var handler = new ScriptedHttpMessageHandler((request, _, _) =>
+        {
+            if (request.Method == HttpMethod.Get)
+            {
+                return Task.FromResult(ScriptedHttpMessageHandler.OkBytes(24));
+            }
+
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+        });
+
+        using var httpClient = new HttpClient(handler)
+        {
+            Timeout = TimeSpan.FromSeconds(5)
+        };
+
+        var backend = new CustomHttpBackend(new TestHttpClientProvider(httpClient));
+
+        var _ = await backend.RunAsync(
+            new SpeedTestConfig
+            {
+                Backend = "custom",
+                DownloadUrl = new Uri("https://example.test/download"),
+                UploadUrl = null,
+                UploadSizeBytes = 0,
+                WarmupRequest = true
+            },
+            CancellationToken.None);
+
+        Assert.Equal(2, handler.Requests.Count);
+    }
 }

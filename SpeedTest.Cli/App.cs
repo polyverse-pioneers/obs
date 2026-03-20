@@ -32,6 +32,12 @@ public static class App
                 };
             }
 
+            if (string.Equals(token, "--warmup-request", StringComparison.Ordinal))
+            {
+                options.WarmupRequest = true;
+                continue;
+            }
+
             if (i + 1 >= args.Length)
             {
                 return new ParseResult
@@ -143,6 +149,8 @@ public static class App
             };
         }
 
+        options.Metadata["run_mode"] = options.WarmupRequest ? "warm" : "cold";
+
         return new ParseResult
         {
             ExitCode = 0,
@@ -157,6 +165,7 @@ public static class App
                 LatencySamples = options.LatencySamples,
                 Concurrency = options.Concurrency,
                 Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds),
+                WarmupRequest = options.WarmupRequest,
                 Metadata = options.Metadata
             }
         };

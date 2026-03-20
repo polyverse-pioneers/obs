@@ -18,6 +18,11 @@ public sealed class CustomHttpBackend : ISpeedTestBackend
             throw new InvalidOperationException("Custom backend requires DownloadUrl.");
         }
 
+        if (config.WarmupRequest)
+        {
+            await WarmupAsync(config.DownloadUrl, ct).ConfigureAwait(false);
+        }
+
         var download = await MeasureDownloadAsync(config.DownloadUrl, ct).ConfigureAwait(false);
         var upload = await MeasureUploadAsync(config.UploadUrl, config.UploadSizeBytes, ct).ConfigureAwait(false);
 
@@ -31,6 +36,13 @@ public sealed class CustomHttpBackend : ISpeedTestBackend
             Upload = upload,
             Metadata = config.Metadata
         };
+    }
+
+    private async Task WarmupAsync(Uri downloadUrl, CancellationToken ct)
+    {
+        using var req = new HttpRequestMessage(HttpMethod.Get, downloadUrl);
+        using var resp = await _http.Client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
+        resp.EnsureSuccessStatusCode();
     }
 
     private async Task<ThroughputResult> MeasureDownloadAsync(Uri downloadUrl, CancellationToken ct)

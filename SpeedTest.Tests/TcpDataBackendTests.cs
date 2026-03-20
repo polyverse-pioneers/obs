@@ -118,4 +118,51 @@ public sealed class TcpDataBackendTests
         Assert.Equal(32, result.Download.BytesTransferred);
         Assert.Equal(3, downloadAttempts);
     }
+
+    [Fact]
+    public async Task RunAsync_PerformsWarmupRequest_WhenEnabled()
+    {
+        var handler = new ScriptedHttpMessageHandler(async (request, _, ct) =>
+        {
+            var uri = request.RequestUri?.ToString() ?? string.Empty;
+
+            if (request.Method == HttpMethod.Get && uri.Contains("size=16", StringComparison.Ordinal))
+            {
+                return ScriptedHttpMessageHandler.OkBytes(16);
+            }
+
+            if (request.Method == HttpMethod.Get && uri.Contains("size=1", StringComparison.Ordinal))
+            {
+                return ScriptedHttpMessageHandler.OkBytes(1);
+            }
+
+            if (request.Method == HttpMethod.Post && uri.EndsWith("/speedtest", StringComparison.Ordinal))
+            {
+                var body = await request.Content!.ReadAsByteArrayAsync(ct);
+                Assert.Single(body);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.NotFound);
+        });
+
+        using var httpClient = new HttpClient(handler)
+        {
+            Timeout = TimeSpan.FromSeconds(5)
+        };
+
+        var backend = new TcpDataBackend(new TestHttpClientProvider(httpClient));
+
+        var _ = await backend.RunAsync(
+            new SpeedTestConfig
+            {
+                WarmupRequest = true,
+                LatencySamples = 1,
+                DownloadSizeBytes = 16,
+                UploadSizeBytes = 1
+            },
+            CancellationToken.None);
+
+        Assert.Equal(4, handler.Requests.Count);
+    }
 }

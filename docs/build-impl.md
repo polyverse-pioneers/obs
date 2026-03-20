@@ -13,6 +13,7 @@ Progress:
 - Phase 5 completed on 2026-03-19: implemented `ResultFormatter` in `SpeedTest.Core` (json/text/prometheus output + JSON error payload); wired `Program.cs` to instantiate backends, call `RunAsync`, format output, and map exceptions to exit codes 2/3. 18 new output formatter tests added; total 40/40 passing.
 - Phase 6 completed on 2026-03-19: quality gates passed (40/40 tests, clean Release build). Published self-contained artifacts to `publish/linux-x64/pip-speed` (77K) and `publish/linux-arm64/pip-speed` (76K). linux-x64 smoke check: binary executes, CLI validation paths and exit codes verified. linux-arm64 artifact confirmed as ELF aarch64 with correct layout.
 - Phase 7 in progress on 2026-03-20: add split download timing to isolate ISP path effects. New download timing contract records (1) time-to-first-byte/headers and (2) payload transfer duration, while preserving existing total duration and Mbps output. JSON and Prometheus outputs gain download timing breakdown metrics.
+- Phase 8 completed on 2026-03-20: added optional `--warmup-request` switch to run one unmeasured pre-flight request before timing. Config and backend paths now support warmup for tcpdata/custom backends; parsing/help/spec updated and regression tests added.
 ## 1. Scope And Decisions
 
 - Runtime: .NET 10.

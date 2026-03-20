@@ -61,16 +61,62 @@ public static class ResultFormatter
     private static string FormatPrometheus(SpeedTestResult result)
     {
         var sb = new StringBuilder();
-        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_avg {result.Latency.AverageMs:G}");
-        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_min {result.Latency.MinMs:G}");
-        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_max {result.Latency.MaxMs:G}");
-        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_jitter {result.Latency.JitterMs:G}");
-        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_mbps {result.Download.Mbps:G}");
-        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_ttfb_ms {result.Download.TimeToFirstByte.TotalMilliseconds:G}");
-        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_transfer_ms {result.Download.TransferDuration.TotalMilliseconds:G}");
-        sb.Append(CultureInfo.InvariantCulture, $"netspeed_upload_mbps {result.Upload.Mbps:G}");
+        var labels = FormatPrometheusLabels(result.Metadata);
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_avg{labels} {result.Latency.AverageMs:G}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_min{labels} {result.Latency.MinMs:G}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_max{labels} {result.Latency.MaxMs:G}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_latency_ms_jitter{labels} {result.Latency.JitterMs:G}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_mbps{labels} {result.Download.Mbps:G}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_ttfb_ms{labels} {result.Download.TimeToFirstByte.TotalMilliseconds:G}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"netspeed_download_transfer_ms{labels} {result.Download.TransferDuration.TotalMilliseconds:G}");
+        sb.Append(CultureInfo.InvariantCulture, $"netspeed_upload_mbps{labels} {result.Upload.Mbps:G}");
         return sb.ToString();
     }
+
+    private static string FormatPrometheusLabels(Dictionary<string, string>? metadata)
+    {
+        if (metadata is null || metadata.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var labels = metadata
+            .Where(pair => !string.IsNullOrWhiteSpace(pair.Key))
+            .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+            .Select(pair => $"{SanitizeLabelName(pair.Key)}=\"{EscapeLabelValue(pair.Value)}\"")
+            .ToArray();
+
+        return labels.Length == 0 ? string.Empty : $"{{{string.Join(',', labels)}}}";
+    }
+
+    private static string SanitizeLabelName(string key)
+    {
+        var chars = key.ToCharArray();
+
+        for (var i = 0; i < chars.Length; i++)
+        {
+            var ch = chars[i];
+            var valid = char.IsLetterOrDigit(ch) || ch == '_';
+
+            if (!valid)
+            {
+                chars[i] = '_';
+            }
+        }
+
+        if (chars.Length == 0 || !(char.IsLetter(chars[0]) || chars[0] == '_'))
+        {
+            return $"label_{new string(chars)}";
+        }
+
+        return new string(chars);
+    }
+
+    private static string EscapeLabelValue(string value) =>
+        value
+            .Replace("\\", "\\\\", StringComparison.Ordinal)
+            .Replace("\"", "\\\"", StringComparison.Ordinal)
+            .Replace("\n", "\\n", StringComparison.Ordinal);
 
     private static string FormatErrorJson(string message)
     {
