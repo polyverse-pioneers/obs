@@ -9,8 +9,7 @@ Progress:
 - Phase 3 completed on 2026-03-18: implemented HTTP abstractions, deterministic upload stream, tcpdata/custom backends, and retry behavior with test-first backend coverage passing via `dotnet test SpeedTest.Tests/SpeedTest.Tests.csproj -c Release` (10/10).
 - Phase 4 completed on 2026-03-18: implemented CLI parsing/validation surface and entrypoint wiring, passed test-first CLI coverage via `dotnet test SpeedTest.Tests/SpeedTest.Tests.csproj -c Release` (15/15), and added full CLI help documentation at docs/cli-help.md. Approved deviation: parser implementation is currently manual in SpeedTest.Cli/App.cs rather than System.CommandLine.
 - Post-Phase-4 refactor completed on 2026-03-18: CLI validation refactored into a fluent-style validator pipeline (`ValidationBuilder`/`Validator`/`ValidationRules`) with dedicated validator unit tests added and passing.
-- Phase 5 completed on 2026-03-19: implemented `ResultFormatter` in `SpeedTest.Core` (json/text/prometheus output + JSON error payload); wired `Program.cs` to instantiate backends, call `RunAsync`, format output, and map exceptions to exit codes 2/3. 18 new output formatter tests added; total 40/40 passing.
-
+- Phase 5 completed on 2026-03-19: implemented `ResultFormatter` in `SpeedTest.Core` (json/text/prometheus output + JSON error payload); wired `Program.cs` to instantiate backends, call `RunAsync`, format output, and map exceptions to exit codes 2/3. 18 new output formatter tests added; total 40/40 passing.- Phase 6 completed on 2026-03-19: quality gates passed (40/40 tests, clean Release build). Published self-contained artifacts to `publish/linux-x64/pip-speed` (77K) and `publish/linux-arm64/pip-speed` (76K). linux-x64 smoke check: binary executes, CLI validation paths and exit codes verified. linux-arm64 artifact confirmed as ELF aarch64 with correct layout.
 ## 1. Scope And Decisions
 
 - Runtime: .NET 10.
