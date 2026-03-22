@@ -1,0 +1,272 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "RTT (ICMP)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 1 },
+      "id": 101,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "probe_icmp_duration_seconds{instance!~\".*([0-9]{1,3}\\\\.){3}[0-9]{1,3}.*\"} * 1000",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Internal RTT",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 1 },
+      "id": 102,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "probe_icmp_duration_seconds{instance=~\".*([0-9]{1,3}\\\\.){3}[0-9]{1,3}.*\"} * 1000",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "External RTT",
+      "type": "timeseries"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+      "id": 200,
+      "panels": [],
+      "title": "Throughput (iperf3)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 8 },
+      "id": 201,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "iperf3_end_sum_sent_bits_per_second",
+          "legendFormat": "end sum sent bps"
+        },
+        {
+          "expr": "iperf3_end_sent_bps",
+          "legendFormat": "end sent bps"
+        },
+        {
+          "expr": "iperf3_end_streams_0_sender_bits_per_second",
+          "legendFormat": "stream sender bps"
+        },
+        {
+          "expr": "iperf3_intervals_9_sum_bits_per_second",
+          "legendFormat": "interval9 sum bps"
+        },
+        {
+          "expr": "iperf3_interval9_bps",
+          "legendFormat": "interval9 bps"
+        }
+      ],
+      "title": "Throughput (Sent)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+      "id": 202,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "iperf3_end_sum_received_bits_per_second",
+          "legendFormat": "end sum received bps"
+        },
+        {
+          "expr": "iperf3_end_received_bps",
+          "legendFormat": "end received bps"
+        },
+        {
+          "expr": "iperf3_end_streams_0_receiver_bits_per_second",
+          "legendFormat": "stream receiver bps"
+        },
+        {
+          "expr": "iperf3_intervals_9_sum_bits_per_second",
+          "legendFormat": "interval9 sum bps"
+        },
+        {
+          "expr": "iperf3_interval9_bps",
+          "legendFormat": "interval9 bps"
+        }
+      ],
+      "title": "Throughput (Received)",
+      "type": "timeseries"
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 300,
+      "panels": [],
+      "title": "iperf3 Diagnostics",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 15 },
+      "id": 301,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "iperf3_end_sum_sent_retransmits",
+          "legendFormat": "end sum retransmits"
+        },
+        {
+          "expr": "iperf3_end_sent_retransmits",
+          "legendFormat": "end sent retransmits"
+        },
+        {
+          "expr": "iperf3_end_streams_0_sender_retransmits",
+          "legendFormat": "stream sender retransmits"
+        },
+        {
+          "expr": "iperf3_intervals_9_sum_retransmits",
+          "legendFormat": "interval9 sum retransmits"
+        },
+        {
+          "expr": "iperf3_intervals_9_streams_0_retransmits",
+          "legendFormat": "interval9 stream retransmits"
+        }
+      ],
+      "title": "Retransmits",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 15 },
+      "id": 302,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "iperf3_end_streams_0_sender_mean_rtt",
+          "legendFormat": "end sender mean rtt"
+        },
+        {
+          "expr": "iperf3_interval9_rtt",
+          "legendFormat": "interval9 rtt"
+        },
+        {
+          "expr": "iperf3_intervals_9_streams_0_rtt",
+          "legendFormat": "interval9 stream rtt"
+        },
+        {
+          "expr": "iperf3_interval9_rttvar",
+          "legendFormat": "interval9 rttvar"
+        },
+        {
+          "expr": "iperf3_intervals_9_streams_0_rttvar",
+          "legendFormat": "interval9 stream rttvar"
+        }
+      ],
+      "title": "Sender RTT (Mean)",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["network", "iperf3", "latency"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Latency & Throughput (Legacy)",
+  "uid": "b9ed9f68-a1f0-4225-b2a1-b3138696a0c4",
+  "version": 1
+}

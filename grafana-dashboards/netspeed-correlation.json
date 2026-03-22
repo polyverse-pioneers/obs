@@ -15,7 +15,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 8,
+  "id": 0,
   "links": [],
   "panels": [
     {
@@ -78,54 +78,7 @@
           },
           "unit": "Mbps"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "TTFB"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "ms"
-              },
-              {
-                "id": "custom.axisPlacement",
-                "value": "right"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Transfer"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "ms"
-              },
-              {
-                "id": "custom.axisPlacement",
-                "value": "right"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -151,34 +104,13 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_download_mbps",
-          "legendFormat": "Download {{size_profile}} {{run_mode}}",
+          "expr": "{__name__=~\"prometheus_netspeed_(${direction})_mbps\",run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
+          "legendFormat": "{{__name__}} {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "A"
-        },
-        {
-          "editorMode": "code",
-          "expr": "prometheus_netspeed_upload_mbps",
-          "legendFormat": "Upload {{size_profile}} {{run_mode}}",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "editorMode": "code",
-          "expr": "prometheus_netspeed_download_ttfb_ms",
-          "legendFormat": "TTFB {{size_profile}} {{run_mode}}",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "editorMode": "code",
-          "expr": "prometheus_netspeed_download_transfer_ms",
-          "legendFormat": "Transfer {{size_profile}} {{run_mode}}",
-          "range": true,
-          "refId": "D"
         }
       ],
-      "title": "Download / Upload Mbps + Timing",
+      "title": "Throughput (Direction Filter)",
       "type": "timeseries"
     },
     {
@@ -267,21 +199,21 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_latency_ms_avg",
+          "expr": "prometheus_netspeed_latency_ms_avg{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Latency Avg {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_latency_ms_min",
+          "expr": "prometheus_netspeed_latency_ms_min{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Latency Min {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_latency_ms_max",
+          "expr": "prometheus_netspeed_latency_ms_max{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Latency Max {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "C"
@@ -376,7 +308,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_latency_ms_jitter",
+          "expr": "prometheus_netspeed_latency_ms_jitter{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Jitter {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "A"
@@ -471,14 +403,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_download_ttfb_ms",
+          "expr": "prometheus_netspeed_download_ttfb_ms{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "TTFB {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_download_transfer_ms",
+          "expr": "prometheus_netspeed_download_transfer_ms{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Transfer {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "B"
@@ -497,16 +429,14 @@
           "color": {
             "mode": "palette-classic"
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
           },
+          "mappings": [],
           "unit": "percent"
         },
         "overrides": []
@@ -539,7 +469,9 @@
           "fields": "",
           "values": false
         },
+        "sort": "desc",
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -548,20 +480,20 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\"}[1h]), 0.001)",
-          "legendFormat": "Cold TTFB {{size_profile}} %",
+          "expr": "100 * last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"${size_profile}\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"${size_profile}\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"${size_profile}\"}[1h]), 0.001)",
+          "legendFormat": "Cold TTFB %",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "100 * last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\"}[1h]), 0.001)",
-          "legendFormat": "Cold Transfer {{size_profile}} %",
+          "expr": "100 * last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"${size_profile}\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"${size_profile}\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"${size_profile}\"}[1h]), 0.001)",
+          "legendFormat": "Cold Transfer %",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "Cold Download Time Composition By Size",
+      "title": "Cold Download Time Composition",
       "type": "piechart"
     },
     {
@@ -575,53 +507,13 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "always",
-            "showValues": false,
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
             }
           },
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 60
-              }
-            ]
-          },
           "unit": "percent"
         },
         "overrides": []
@@ -634,12 +526,27 @@
       },
       "id": 6,
       "options": {
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
         "legend": {
-          "calcs": [],
           "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "percent"
+          ]
         },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "desc",
         "tooltip": {
           "hideZeros": false,
           "mode": "single",
@@ -650,14 +557,21 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * avg_over_time(prometheus_netspeed_download_ttfb_ms[1h]) / clamp_min(avg_over_time(prometheus_netspeed_download_ttfb_ms[1h]) + avg_over_time(prometheus_netspeed_download_transfer_ms[1h]), 0.001)",
-          "legendFormat": "{{size_profile}} {{run_mode}} TTFB Share",
+          "expr": "100 * last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"${size_profile}\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"${size_profile}\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"${size_profile}\"}[1h]), 0.001)",
+          "legendFormat": "Warm TTFB %",
           "range": true,
           "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "100 * last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"${size_profile}\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"${size_profile}\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"${size_profile}\"}[1h]), 0.001)",
+          "legendFormat": "Warm Transfer %",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "TTFB Share Trend By Size And Run Mode",
-      "type": "timeseries"
+      "title": "Warm Download Time Composition",
+      "type": "piechart"
     },
     {
       "datasource": {
@@ -741,21 +655,21 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_download_ttfb_ms",
+          "expr": "prometheus_netspeed_download_ttfb_ms{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "TTFB {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_latency_ms_avg",
+          "expr": "prometheus_netspeed_latency_ms_avg{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Latency Avg {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "B"
         },
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_latency_ms_jitter",
+          "expr": "prometheus_netspeed_latency_ms_jitter{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Jitter {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "C"
@@ -846,14 +760,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\"}[1h]))",
+          "expr": "avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=~\"${size_profile:regex}\"}[1h]))",
           "legendFormat": "Warm {{size_profile}} TTFB (1h avg)",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\"}[1h]))",
+          "expr": "avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=~\"${size_profile:regex}\"}[1h]))",
           "legendFormat": "Cold {{size_profile}} TTFB (1h avg)",
           "range": true,
           "refId": "B"
@@ -944,14 +858,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"warm\"}[1h]))",
+          "expr": "avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"warm\",size_profile=~\"${size_profile:regex}\"}[1h]))",
           "legendFormat": "Warm {{size_profile}} Download (1h avg)",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"cold\"}[1h]))",
+          "expr": "avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"cold\",size_profile=~\"${size_profile:regex}\"}[1h]))",
           "legendFormat": "Cold {{size_profile}} Download (1h avg)",
           "range": true,
           "refId": "B"
@@ -1010,7 +924,7 @@
             "steps": [
               {
                 "color": "red",
-                "value": null
+                "value": 0
               },
               {
                 "color": "green",
@@ -1046,14 +960,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 * (avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\"}[1h])) - avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\"}[1h]))) / clamp_min(avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\"}[1h])), 0.001)",
+          "expr": "100 * (avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=~\"${size_profile:regex}\"}[1h])) - avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=~\"${size_profile:regex}\"}[1h]))) / clamp_min(avg by (size_profile) (avg_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=~\"${size_profile:regex}\"}[1h])), 0.001)",
           "legendFormat": "TTFB Reduction {{size_profile}} (%)",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "100 * (avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"warm\"}[1h])) - avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"cold\"}[1h]))) / clamp_min(avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"cold\"}[1h])), 0.001)",
+          "expr": "100 * (avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"warm\",size_profile=~\"${size_profile:regex}\"}[1h])) - avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"cold\",size_profile=~\"${size_profile:regex}\"}[1h]))) / clamp_min(avg by (size_profile) (avg_over_time(prometheus_netspeed_download_mbps{run_mode=\"cold\",size_profile=~\"${size_profile:regex}\"}[1h])), 0.001)",
           "legendFormat": "Download Gain {{size_profile}} (%)",
           "range": true,
           "refId": "B"
@@ -1148,14 +1062,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_run_success",
+          "expr": "prometheus_netspeed_run_success{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Run Success {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "prometheus_netspeed_run_exit_code",
+          "expr": "prometheus_netspeed_run_exit_code{run_mode=~\"${run_mode:regex}\",size_profile=~\"${size_profile:regex}\"}",
           "legendFormat": "Exit Code {{size_profile}} {{run_mode}}",
           "range": true,
           "refId": "B"
@@ -1166,7 +1080,7 @@
     }
   ],
   "preload": false,
-  "refresh": "30s",
+  "refresh": "5m",
   "schemaVersion": 42,
   "tags": [
     "netspeed",
@@ -1174,15 +1088,109 @@
     "network"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "text": "download|upload",
+          "value": "download|upload"
+        },
+        "label": "Direction",
+        "name": "direction",
+        "options": [
+          {
+            "selected": false,
+            "text": "download",
+            "value": "download"
+          },
+          {
+            "selected": false,
+            "text": "upload",
+            "value": "upload"
+          },
+          {
+            "selected": true,
+            "text": "both",
+            "value": "download|upload"
+          }
+        ],
+        "query": "download : download,upload : upload,both : download|upload",
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "includeAll": true,
+        "label": "Run Mode",
+        "name": "run_mode",
+        "options": [
+          {
+            "selected": false,
+            "text": "cold",
+            "value": "cold"
+          },
+          {
+            "selected": false,
+            "text": "warm",
+            "value": "warm"
+          }
+        ],
+        "query": {
+          "query": "label_values(prometheus_netspeed_download_mbps, run_mode)",
+          "refId": "RunModeVariableQuery"
+        },
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "large",
+          "value": "large"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "includeAll": false,
+        "label": "Size Profile",
+        "name": "size_profile",
+        "options": [
+          {
+            "selected": true,
+            "text": "large",
+            "value": "large"
+          },
+          {
+            "selected": false,
+            "text": "medium",
+            "value": "medium"
+          },
+          {
+            "selected": false,
+            "text": "small",
+            "value": "small"
+          }
+        ],
+        "query": {
+          "query": "label_values(prometheus_netspeed_download_mbps, size_profile)",
+          "refId": "SizeProfileVariableQuery"
+        },
+        "type": "query"
+      }
+    ]
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Netspeed Correlation",
   "uid": "50646b57-ac77-43f4-8d96-6bb6515bcaa5",
-  "version": 11
+  "version": 21
 }
