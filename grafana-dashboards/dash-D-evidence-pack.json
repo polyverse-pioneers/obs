@@ -1,1 +1,855 @@
-{"annotations":{"list":[{"builtIn":1,"datasource":{"type":"grafana","uid":"-- Grafana --"},"enable":true,"hide":true,"iconColor":"rgba(0, 211, 255, 1)","name":"Annotations & Alerts","type":"dashboard"}]},"editable":true,"fiscalYearStartMonth":0,"graphTooltip":1,"links":[],"panels":[{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"hideFrom":{"legend":false,"tooltip":false,"viz":false}},"mappings":[],"unit":"percent"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":0,"y":0},"id":1,"options":{"displayLabels":["name","percent"],"legend":{"displayMode":"list","placement":"right","showLegend":true,"values":["percent"]},"pieType":"pie","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"sort":"desc","tooltip":{"hideZeros":false,"mode":"single","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"100 * last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]), 0.001)","legendFormat":"Cold TTFB %","range":true,"refId":"A"},{"editorMode":"code","expr":"100 * last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]), 0.001)","legendFormat":"Cold Transfer %","range":true,"refId":"B"}],"title":"Cold Download Composition (Small)","type":"piechart"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"hideFrom":{"legend":false,"tooltip":false,"viz":false}},"mappings":[],"unit":"percent"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":12,"y":0},"id":2,"options":{"displayLabels":["name","percent"],"legend":{"displayMode":"list","placement":"right","showLegend":true,"values":["percent"]},"pieType":"pie","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"sort":"desc","tooltip":{"hideZeros":false,"mode":"single","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"100 * last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]), 0.001)","legendFormat":"Warm TTFB %","range":true,"refId":"A"},{"editorMode":"code","expr":"100 * last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]), 0.001)","legendFormat":"Warm Transfer %","range":true,"refId":"B"}],"title":"Warm Download Composition (Small)","type":"piechart"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisBorderShow":false,"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"barWidthFactor":0.6,"drawStyle":"bars","fillOpacity":100,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"insertNulls":false,"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"never","showValues":"auto","spanNulls":false,"stacking":{"group":"A","mode":"normal"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":0}]},"unit":"short"},"overrides":[]},"gridPos":{"h":8,"w":24,"x":0,"y":8},"id":3,"options":{"legend":{"calcs":["sum"],"displayMode":"list","placement":"bottom","showLegend":true},"tooltip":{"hideZeros":false,"mode":"multi","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"increase(prometheus_netspeed_run_success[24h])","legendFormat":"Successful Runs {{size_profile}} {{run_mode}}","range":true,"refId":"A"},{"editorMode":"code","expr":"increase(prometheus_netspeed_run_exit_code[24h])","legendFormat":"Failed Runs {{size_profile}} {{run_mode}}","range":true,"refId":"B"}],"title":"Daily Run Success Rate","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisBorderShow":false,"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"barWidthFactor":0.6,"drawStyle":"line","fillOpacity":0,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"insertNulls":false,"lineInterpolation":"linear","lineWidth":2,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","showValues":false,"spanNulls":true,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":0}]},"unit":"Mbps"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":0,"y":16},"id":4,"options":{"legend":{"calcs":["mean","max","min"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":false,"mode":"single","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"avg_over_time(prometheus_netspeed_download_mbps{size_profile=\"small\"}[24h])","legendFormat":"Download Avg (24h)","range":true,"refId":"A"}],"title":"Small Profile - Download Statistics","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisBorderShow":false,"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"barWidthFactor":0.6,"drawStyle":"line","fillOpacity":0,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"insertNulls":false,"lineInterpolation":"linear","lineWidth":2,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","showValues":false,"spanNulls":true,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":0}]},"unit":"ms"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":12,"y":16},"id":5,"options":{"legend":{"calcs":["mean","max"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"hideZeros":false,"mode":"single","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"avg_over_time(prometheus_netspeed_latency_ms_avg{size_profile=\"small\"}[24h])","legendFormat":"Latency Avg (24h)","range":true,"refId":"A"}],"title":"Small Profile - Latency Statistics","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisBorderShow":false,"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"barWidthFactor":0.6,"drawStyle":"line","fillOpacity":0,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"insertNulls":false,"lineInterpolation":"linear","lineWidth":2,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","showValues":false,"spanNulls":true,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":0},{"color":"red","value":1000}]},"unit":"ms"},"overrides":[]},"gridPos":{"h":8,"w":24,"x":0,"y":24},"id":6,"options":{"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":true},"tooltip":{"hideZeros":false,"mode":"single","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"quantile_over_time(0.95, prometheus_netspeed_download_ttfb_ms[24h])","legendFormat":"P95 TTFB {{size_profile}} {{run_mode}}","range":true,"refId":"A"},{"editorMode":"code","expr":"quantile_over_time(0.99, prometheus_netspeed_download_ttfb_ms[24h])","legendFormat":"P99 TTFB {{size_profile}} {{run_mode}}","range":true,"refId":"B"}],"title":"TTFB SLA Metrics (P95/P99)","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":0},{"color":"yellow","value":50},{"color":"red","value":100}]},"unit":"Mbps"},"overrides":[]},"gridPos":{"h":4,"w":6,"x":0,"y":32},"id":7,"options":{"colorMode":"value","graphMode":"none","justifyMode":"center","orientation":"auto","percentChangeColorMode":"standard","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"textMode":"value","wideLayout":true},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"last_over_time(prometheus_netspeed_download_mbps{size_profile=\"small\",run_mode=\"warm\"}[24h])","legendFormat":"Last Download","range":true,"refId":"A"}],"title":"Latest Download (Warm)","type":"stat"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":0},{"color":"yellow","value":30},{"color":"red","value":50}]},"unit":"ms"},"overrides":[]},"gridPos":{"h":4,"w":6,"x":6,"y":32},"id":8,"options":{"colorMode":"value","graphMode":"none","justifyMode":"center","orientation":"auto","percentChangeColorMode":"standard","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"textMode":"value","wideLayout":true},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"last_over_time(prometheus_netspeed_latency_ms_avg{size_profile=\"small\",run_mode=\"warm\"}[24h])","legendFormat":"Last Latency","range":true,"refId":"A"}],"title":"Latest Latency (Warm)","type":"stat"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":0},{"color":"yellow","value":20},{"color":"red","value":50}]},"unit":"ms"},"overrides":[]},"gridPos":{"h":4,"w":6,"x":12,"y":32},"id":9,"options":{"colorMode":"value","graphMode":"none","justifyMode":"center","orientation":"auto","percentChangeColorMode":"standard","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"textMode":"value","wideLayout":true},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"last_over_time(prometheus_netspeed_download_ttfb_ms{size_profile=\"small\",run_mode=\"cold\"}[24h])","legendFormat":"Last TTFB","range":true,"refId":"A"}],"title":"Latest TTFB (Cold)","type":"stat"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":100},{"color":"yellow","value":90},{"color":"red","value":80}]},"unit":"percent"},"overrides":[]},"gridPos":{"h":4,"w":6,"x":18,"y":32},"id":10,"options":{"colorMode":"value","graphMode":"none","justifyMode":"center","orientation":"auto","percentChangeColorMode":"standard","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"textMode":"value","wideLayout":true},"pluginVersion":"12.3.3","targets":[{"editorMode":"code","expr":"100 * sum_over_time(prometheus_netspeed_run_success[24h]) / clamp_min(count_over_time(prometheus_netspeed_run_success[24h]), 1)","legendFormat":"Test Success %","range":true,"refId":"A"}],"title":"24h Success Rate","type":"stat"}],"preload":false,"refresh":"30s","schemaVersion":42,"tags":["phase3","evidence","sla","export"],"templating":{"list":[]},"time":{"from":"now-7d","to":"now"},"timepicker":{},"timezone":"","title":"Evidence Pack & SLA Metrics","uid":"phase3-dashboard-d","version":2,"weekStart":""}
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 1,
+    "links": [],
+    "panels": [
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        }
+                    },
+                    "mappings": [],
+                    "unit": "percent"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 0
+            },
+            "id": 1,
+            "options": {
+                "displayLabels": [
+                    "name",
+                    "percent"
+                ],
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "right",
+                    "showLegend": true,
+                    "values": [
+                        "percent"
+                    ]
+                },
+                "pieType": "pie",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "sort": "desc",
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "100 * last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]), 0.001)",
+                    "legendFormat": "Cold TTFB %",
+                    "range": true,
+                    "refId": "A"
+                },
+                {
+                    "editorMode": "code",
+                    "expr": "100 * last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"cold\",size_profile=\"small\"}[1h]), 0.001)",
+                    "legendFormat": "Cold Transfer %",
+                    "range": true,
+                    "refId": "B"
+                }
+            ],
+            "title": "Cold Download Composition (Small)",
+            "type": "piechart"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        }
+                    },
+                    "mappings": [],
+                    "unit": "percent"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 0
+            },
+            "id": 2,
+            "options": {
+                "displayLabels": [
+                    "name",
+                    "percent"
+                ],
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "right",
+                    "showLegend": true,
+                    "values": [
+                        "percent"
+                    ]
+                },
+                "pieType": "pie",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "sort": "desc",
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "100 * last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]), 0.001)",
+                    "legendFormat": "Warm TTFB %",
+                    "range": true,
+                    "refId": "A"
+                },
+                {
+                    "editorMode": "code",
+                    "expr": "100 * last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]) / clamp_min(last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]) + last_over_time(prometheus_netspeed_download_transfer_ms{run_mode=\"warm\",size_profile=\"small\"}[1h]), 0.001)",
+                    "legendFormat": "Warm Transfer %",
+                    "range": true,
+                    "refId": "B"
+                }
+            ],
+            "title": "Warm Download Composition (Small)",
+            "type": "piechart"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "bars",
+                        "fillOpacity": 100,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "never",
+                        "showValues": "auto",
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "normal"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 8
+            },
+            "id": 3,
+            "options": {
+                "legend": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "multi",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "increase(prometheus_netspeed_run_success[24h])",
+                    "legendFormat": "Successful Runs {{size_profile}} {{run_mode}}",
+                    "range": true,
+                    "refId": "A"
+                },
+                {
+                    "editorMode": "code",
+                    "expr": "increase(prometheus_netspeed_run_exit_code[24h])",
+                    "legendFormat": "Failed Runs {{size_profile}} {{run_mode}}",
+                    "range": true,
+                    "refId": "B"
+                }
+            ],
+            "title": "Daily Run Success Rate",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 2,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "showValues": false,
+                        "spanNulls": true,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "unit": "Mbps"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 16
+            },
+            "id": 4,
+            "options": {
+                "legend": {
+                    "calcs": [
+                        "mean",
+                        "max",
+                        "min"
+                    ],
+                    "displayMode": "table",
+                    "placement": "right",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "avg_over_time(prometheus_netspeed_download_mbps{size_profile=\"small\"}[24h])",
+                    "legendFormat": "Download Avg (24h)",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Small Profile - Download Statistics",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 2,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "showValues": false,
+                        "spanNulls": true,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "unit": "ms"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 16
+            },
+            "id": 5,
+            "options": {
+                "legend": {
+                    "calcs": [
+                        "mean",
+                        "max"
+                    ],
+                    "displayMode": "table",
+                    "placement": "right",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "avg_over_time(prometheus_netspeed_latency_ms_avg{size_profile=\"small\"}[24h])",
+                    "legendFormat": "Latency Avg (24h)",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Small Profile - Latency Statistics",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisColorMode": "text",
+                        "axisLabel": "",
+                        "axisPlacement": "auto",
+                        "barAlignment": 0,
+                        "barWidthFactor": 0.6,
+                        "drawStyle": "line",
+                        "fillOpacity": 0,
+                        "gradientMode": "none",
+                        "hideFrom": {
+                            "legend": false,
+                            "tooltip": false,
+                            "viz": false
+                        },
+                        "insertNulls": false,
+                        "lineInterpolation": "linear",
+                        "lineWidth": 2,
+                        "pointSize": 5,
+                        "scaleDistribution": {
+                            "type": "linear"
+                        },
+                        "showPoints": "auto",
+                        "showValues": false,
+                        "spanNulls": true,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "none"
+                        },
+                        "thresholdsStyle": {
+                            "mode": "off"
+                        }
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "red",
+                                "value": 1000
+                            }
+                        ]
+                    },
+                    "unit": "ms"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 24
+            },
+            "id": 6,
+            "options": {
+                "legend": {
+                    "calcs": [],
+                    "displayMode": "list",
+                    "placement": "bottom",
+                    "showLegend": true
+                },
+                "tooltip": {
+                    "hideZeros": false,
+                    "mode": "single",
+                    "sort": "none"
+                }
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "quantile_over_time(0.95, prometheus_netspeed_download_ttfb_ms[24h])",
+                    "legendFormat": "P95 TTFB {{size_profile}} {{run_mode}}",
+                    "range": true,
+                    "refId": "A"
+                },
+                {
+                    "editorMode": "code",
+                    "expr": "quantile_over_time(0.99, prometheus_netspeed_download_ttfb_ms[24h])",
+                    "legendFormat": "P99 TTFB {{size_profile}} {{run_mode}}",
+                    "range": true,
+                    "refId": "B"
+                }
+            ],
+            "title": "TTFB SLA Metrics (P95/P99)",
+            "type": "timeseries"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 50
+                            },
+                            {
+                                "color": "red",
+                                "value": 100
+                            }
+                        ]
+                    },
+                    "unit": "Mbps"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 0,
+                "y": 32
+            },
+            "id": 7,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "value",
+                "wideLayout": true
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "last_over_time(prometheus_netspeed_download_mbps{size_profile=\"small\",run_mode=\"warm\"}[24h])",
+                    "legendFormat": "Last Download",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Latest Download (Warm)",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 30
+                            },
+                            {
+                                "color": "red",
+                                "value": 50
+                            }
+                        ]
+                    },
+                    "unit": "ms"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 6,
+                "y": 32
+            },
+            "id": 8,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "value",
+                "wideLayout": true
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "last_over_time(prometheus_netspeed_latency_ms_avg{size_profile=\"small\",run_mode=\"warm\"}[24h])",
+                    "legendFormat": "Last Latency",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Latest Latency (Warm)",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 0
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 20
+                            },
+                            {
+                                "color": "red",
+                                "value": 50
+                            }
+                        ]
+                    },
+                    "unit": "ms"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 12,
+                "y": 32
+            },
+            "id": 9,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "value",
+                "wideLayout": true
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "last_over_time(prometheus_netspeed_download_ttfb_ms{size_profile=\"small\",run_mode=\"cold\"}[24h])",
+                    "legendFormat": "Last TTFB",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "Latest TTFB (Cold)",
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": 100
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 90
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    },
+                    "unit": "percent"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 18,
+                "y": 32
+            },
+            "id": 10,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "value",
+                "wideLayout": true
+            },
+            "pluginVersion": "12.3.3",
+            "targets": [
+                {
+                    "editorMode": "code",
+                    "expr": "100 * sum_over_time(prometheus_netspeed_run_success[24h]) / clamp_min(count_over_time(prometheus_netspeed_run_success[24h]), 1)",
+                    "legendFormat": "Test Success %",
+                    "range": true,
+                    "refId": "A"
+                }
+            ],
+            "title": "24h Success Rate",
+            "type": "stat"
+        }
+    ],
+    "preload": false,
+    "refresh": "30s",
+    "schemaVersion": 42,
+    "tags": [
+        "phase3",
+        "evidence",
+        "sla",
+        "export"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-7d",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Evidence Pack & SLA Metrics",
+    "uid": "phase3-dashboard-d",
+    "version": 2,
+    "weekStart": ""
+}
