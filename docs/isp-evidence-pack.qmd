@@ -1,0 +1,353 @@
+---
+title: "ISP Evidence Pack"
+subtitle: "Prometheus-Direct 14-day Report"
+format:
+  pdf:
+    toc: true
+    number-sections: true
+params:
+  prometheus_url: "http://planck-primary:9090"
+  report_days: 14
+  contracted_download_mbps: 1000
+---
+
+```{python}
+#| tags: [parameters]
+#| include: false
+prometheus_url = "http://planck-primary:9090"
+report_days = 14
+contracted_download_mbps = 1000
+```
+
+```{python}
+#| echo: false
+import datetime as dt
+print(f"Generated UTC: {dt.datetime.utcnow().isoformat(timespec='seconds')}Z")
+```
+
+## Executive Summary
+
+This report is built directly from Prometheus queries. It is designed to support an ISP escalation by showing:
+
+1. Persistent WAN underperformance over many days.
+2. LAN control performance that is much higher than WAN.
+3. Quality context (latency/loss/jitter) to separate sustained limitation from isolated spikes.
+
+## ISP Call Script (Use This First)
+
+Read this section first on the call.
+
+Claim statement:
+
+"Our measurements over the last two weeks show persistent WAN download limitation, while internal LAN throughput remains healthy. The behavior is consistent with sustained line limitation and not just random congestion spikes."
+
+Evidence bullets:
+
+1. "This report includes roughly two weeks of repeated tests, not one-off snapshots."
+2. "WAN download stays in a narrow low range over many days."
+3. "LAN control tests are far higher than WAN during the same period, so the local network is not the bottleneck."
+4. "Packet loss and RTT context are included; throughput shortfall persists beyond isolated transient events."
+5. "All query methods are documented in the appendix for reproducibility."
+
+Direct ask to ISP:
+
+"Please open a line engineering investigation for sustained throughput limitation on this circuit, verify shaping/policy controls on our account, and provide findings for CMTS/OLT node utilization, profile/policer settings, and any rate-limit or traffic-management policy applied to our line during this date range."
+
+If they push back with "normal congestion":
+
+"Please explain why internal control throughput remains high while WAN is persistently capped across many days, and provide a timestamped utilization and policy report for our node and service profile."
+
+Target outcome for this call:
+
+1. Trouble ticket number.
+2. Escalation to line engineering (not basic support only).
+3. Written confirmation of whether shaping/policing is active on this account.
+4. Follow-up window with exact next update time.
+
+```{python}
+#| echo: false
+import json
+import urllib.parse
+import urllib.request
+from typing import List, Tuple
+from IPython.display import HTML, display
+
+PROM = str(prometheus_url).rstrip("/")
+DAYS = int(report_days)
+PLAN = float(contracted_download_mbps)
+
+
+def prom_instant(query: str):
+    url = f"{PROM}/api/v1/query?" + urllib.parse.urlencode({"query": query})
+    with urllib.request.urlopen(url, timeout=30) as r:
+        payload = json.load(r)
+    result = payload.get("data", {}).get("result", [])
+    if not result:
+        return None
+    return float(result[0]["value"][1])
+
+
+def prom_instant_any(queries):
+    for q in queries:
+        v = prom_instant(q)
+        if v is not None:
+            return v
+    return None
+
+
+def fmt(v, unit=""):
+    if v is None:
+        return "N/A"
+    return f"{v:.2f}{(' ' + unit) if unit else ''}"
+
+
+s = {
+    "sample_count": prom_instant_any([
+        f'count_over_time(prometheus_netspeed_download_mbps{{size_profile="small",run_mode="cold"}}[{DAYS}d])',
+        f'count_over_time(prometheus_netspeed_download_mbps[{DAYS}d])',
+    ]),
+    "wan_dl_p50": prom_instant_any([
+        f'quantile_over_time(0.5,prometheus_netspeed_download_mbps{{size_profile="small",run_mode="cold"}}[{DAYS}d])',
+        f'quantile_over_time(0.5,prometheus_netspeed_download_mbps[{DAYS}d])',
+    ]),
+    "wan_dl_p95": prom_instant_any([
+        f'quantile_over_time(0.95,prometheus_netspeed_download_mbps{{size_profile="small",run_mode="cold"}}[{DAYS}d])',
+        f'quantile_over_time(0.95,prometheus_netspeed_download_mbps[{DAYS}d])',
+    ]),
+    "wan_dl_avg": prom_instant_any([
+        f'avg_over_time(prometheus_netspeed_download_mbps{{size_profile="small",run_mode="cold"}}[{DAYS}d])',
+        f'avg_over_time(prometheus_netspeed_download_mbps[{DAYS}d])',
+    ]),
+    "wan_ul_p50": prom_instant_any([
+        f'quantile_over_time(0.5,prometheus_netspeed_upload_mbps{{size_profile="small",run_mode="cold"}}[{DAYS}d])',
+        f'quantile_over_time(0.5,prometheus_netspeed_upload_mbps[{DAYS}d])',
+    ]),
+    "wan_lat_p95": prom_instant_any([
+        f'quantile_over_time(0.95,prometheus_netspeed_latency_ms_avg{{size_profile="small",run_mode="cold"}}[{DAYS}d])',
+        f'quantile_over_time(0.95,prometheus_netspeed_latency_ms_avg[{DAYS}d])',
+    ]),
+    "wan_jitter_p95": prom_instant_any([
+        f'quantile_over_time(0.95,prometheus_netspeed_latency_ms_jitter{{size_profile="small",run_mode="cold"}}[{DAYS}d])',
+        f'quantile_over_time(0.95,prometheus_netspeed_latency_ms_jitter[{DAYS}d])',
+    ]),
+    "wan_success": prom_instant(f'100*sum_over_time(prometheus_netspeed_run_success[{DAYS}d])/clamp_min(count_over_time(prometheus_netspeed_run_success[{DAYS}d]),1)'),
+    "lan_rx_p50": prom_instant(f'quantile_over_time(0.5,iperf3_end_sum_received_bits_per_second[{DAYS}d])/1e6'),
+    "lan_rx_p95": prom_instant(f'quantile_over_time(0.95,iperf3_end_sum_received_bits_per_second[{DAYS}d])/1e6'),
+    "ext_loss_avg": prom_instant(f'avg_over_time(ping_percent_packet_loss{{url="1.1.1.1"}}[{DAYS}d])'),
+    "ext_rtt_p95": prom_instant(f'quantile_over_time(0.95,ping_average_response_ms{{url="1.1.1.1"}}[{DAYS}d])'),
+}
+
+profile_download_p50 = {}
+profile_download_p95 = {}
+for profile in ["small", "medium", "large"]:
+    profile_download_p50[profile] = prom_instant_any([
+        f'quantile_over_time(0.5,prometheus_netspeed_download_mbps{{size_profile="{profile}",run_mode="cold"}}[{DAYS}d])',
+        f'quantile_over_time(0.5,prometheus_netspeed_download_mbps{{size_profile="{profile}"}}[{DAYS}d])',
+    ])
+    profile_download_p95[profile] = prom_instant_any([
+        f'quantile_over_time(0.95,prometheus_netspeed_download_mbps{{size_profile="{profile}",run_mode="cold"}}[{DAYS}d])',
+        f'quantile_over_time(0.95,prometheus_netspeed_download_mbps{{size_profile="{profile}"}}[{DAYS}d])',
+    ])
+
+shortfall = None if s["wan_dl_p50"] is None else max(0.0, 100.0 * (1.0 - s["wan_dl_p50"] / PLAN))
+
+rows = [
+    (f"Samples ({DAYS}d)", str(int(s['sample_count'])) if s['sample_count'] is not None else "N/A"),
+    ("WAN download p50", fmt(s['wan_dl_p50'], 'Mbps')),
+    ("WAN download p95", fmt(s['wan_dl_p95'], 'Mbps')),
+    ("WAN download avg", fmt(s['wan_dl_avg'], 'Mbps')),
+    ("WAN upload p50", fmt(s['wan_ul_p50'], 'Mbps')),
+    ("WAN latency p95", fmt(s['wan_lat_p95'], 'ms')),
+    ("WAN jitter p95", fmt(s['wan_jitter_p95'], 'ms')),
+    ("WAN success rate", fmt(s['wan_success'], '%')),
+    (f"WAN shortfall vs {PLAN:.0f} Mbps plan", fmt(shortfall, '%')),
+    ("WAN download p50 (small)", fmt(profile_download_p50["small"], 'Mbps')),
+    ("WAN download p50 (medium)", fmt(profile_download_p50["medium"], 'Mbps')),
+    ("WAN download p50 (large)", fmt(profile_download_p50["large"], 'Mbps')),
+    ("WAN download p95 (small)", fmt(profile_download_p95["small"], 'Mbps')),
+    ("WAN download p95 (medium)", fmt(profile_download_p95["medium"], 'Mbps')),
+    ("WAN download p95 (large)", fmt(profile_download_p95["large"], 'Mbps')),
+    ("LAN receive p50", fmt(s['lan_rx_p50'], 'Mbps')),
+    ("LAN receive p95", fmt(s['lan_rx_p95'], 'Mbps')),
+    ("External packet loss avg", fmt(s['ext_loss_avg'], '%')),
+    ("External RTT p95", fmt(s['ext_rtt_p95'], 'ms')),
+]
+
+html_rows = "".join([
+    f"<tr><td>{k}</td><td style='text-align:right'>{v}</td></tr>" for k, v in rows
+])
+html_table = (
+    "<table style='border-collapse:collapse;width:100%'>"
+    "<thead><tr><th style='text-align:left'>Metric</th><th style='text-align:right'>Value</th></tr></thead>"
+    f"<tbody>{html_rows}</tbody></table>"
+)
+display(HTML(html_table))
+```
+
+## Trend Charts
+
+```{python}
+#| echo: false
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+
+
+def prom_range(query: str, days: int = DAYS, step: str = "30m") -> Tuple[List[dt.datetime], List[float]]:
+    end = dt.datetime.utcnow()
+    start = end - dt.timedelta(days=days)
+    params_q = {
+        "query": query,
+        "start": f"{start.timestamp():.0f}",
+        "end": f"{end.timestamp():.0f}",
+        "step": step,
+    }
+    url = f"{PROM}/api/v1/query_range?" + urllib.parse.urlencode(params_q)
+    with urllib.request.urlopen(url, timeout=45) as r:
+        payload = json.load(r)
+    result = payload.get("data", {}).get("result", [])
+    if not result:
+        return [], []
+
+    points = result[0].get("values", [])
+    xs = [dt.datetime.utcfromtimestamp(float(t)) for t, _ in points]
+    ys = []
+    for _, val in points:
+        try:
+            ys.append(float(val))
+        except ValueError:
+            ys.append(float("nan"))
+    return xs, ys
+
+
+def prom_range_any(queries, days: int = DAYS, step: str = "30m") -> Tuple[List[dt.datetime], List[float]]:
+    for q in queries:
+        xs, ys = prom_range(q, days=days, step=step)
+        if xs and any(not (v != v) for v in ys):
+            return xs, ys
+    return [], []
+
+
+fig, axes = plt.subplots(4, 1, figsize=(11, 15), constrained_layout=True)
+
+# 1) WAN throughput
+x_small, y_small = prom_range_any([
+    'avg by () (last_over_time(prometheus_netspeed_download_mbps{size_profile="small",run_mode="cold"}[6h]))',
+    'avg by () (last_over_time(prometheus_netspeed_download_mbps{size_profile="small"}[6h]))',
+])
+x_medium, y_medium = prom_range_any([
+    'avg by () (last_over_time(prometheus_netspeed_download_mbps{size_profile="medium",run_mode="cold"}[6h]))',
+    'avg by () (last_over_time(prometheus_netspeed_download_mbps{size_profile="medium"}[6h]))',
+])
+x_large, y_large = prom_range_any([
+    'avg by () (last_over_time(prometheus_netspeed_download_mbps{size_profile="large",run_mode="cold"}[6h]))',
+    'avg by () (last_over_time(prometheus_netspeed_download_mbps{size_profile="large"}[6h]))',
+])
+x_any, y_any = prom_range_any([
+    'avg by () (last_over_time(prometheus_netspeed_download_mbps[6h]))',
+])
+_, y_ul = prom_range_any([
+    'avg by () (last_over_time(prometheus_netspeed_upload_mbps{size_profile="small",run_mode="cold"}[6h]))',
+    'avg by () (last_over_time(prometheus_netspeed_upload_mbps[6h]))',
+])
+
+if x_small:
+    axes[0].plot(x_small, y_small, label="WAN download small", linewidth=1.8)
+if x_medium:
+    axes[0].plot(x_medium, y_medium, label="WAN download medium", linewidth=1.6)
+if x_large:
+    axes[0].plot(x_large, y_large, label="WAN download large", linewidth=1.6)
+if (not x_small) and (not x_medium) and (not x_large) and x_any:
+    axes[0].plot(x_any, y_any, label="WAN download (unlabeled)", linewidth=1.8)
+
+if x_small:
+    axes[0].plot(x_small, y_ul, label="WAN upload", linewidth=1.2, alpha=0.8)
+elif x_any:
+    axes[0].plot(x_any, y_ul, label="WAN upload", linewidth=1.2, alpha=0.8)
+
+axes[0].axhline(PLAN, linestyle="--", linewidth=1.2, label=f"Contracted download ({PLAN:.0f} Mbps)")
+axes[0].set_ylabel("Mbps")
+axes[0].set_title("WAN Throughput Trend")
+axes[0].legend(loc="upper right", fontsize=8)
+axes[0].grid(alpha=0.25)
+
+# 2) WAN latency and jitter
+x2, y_lat = prom_range_any([
+    'avg by () (last_over_time(prometheus_netspeed_latency_ms_avg{size_profile="small",run_mode="cold"}[6h]))',
+    'avg by () (last_over_time(prometheus_netspeed_latency_ms_avg[6h]))',
+])
+_, y_jit = prom_range_any([
+    'avg by () (last_over_time(prometheus_netspeed_latency_ms_jitter{size_profile="small",run_mode="cold"}[6h]))',
+    'avg by () (last_over_time(prometheus_netspeed_latency_ms_jitter[6h]))',
+])
+axes[1].plot(x2, y_lat, label="Latency avg", linewidth=1.5)
+axes[1].plot(x2, y_jit, label="Jitter", linewidth=1.2)
+axes[1].set_ylabel("ms")
+axes[1].set_title("WAN Latency and Jitter")
+axes[1].legend(loc="upper right", fontsize=8)
+axes[1].grid(alpha=0.25)
+
+# 3) External ping quality
+x3, y_loss = prom_range('ping_percent_packet_loss{url="1.1.1.1"}', step="1h")
+_, y_ping = prom_range('ping_average_response_ms{url="1.1.1.1"}', step="1h")
+ax3a = axes[2]
+ax3b = ax3a.twinx()
+ax3a.plot(x3, y_ping, color="tab:blue", linewidth=1.4, label="RTT avg")
+ax3b.plot(x3, y_loss, color="tab:red", linewidth=1.2, alpha=0.75, label="Packet loss %")
+ax3a.set_ylabel("RTT (ms)")
+ax3b.set_ylabel("Loss (%)")
+ax3a.set_title("External Quality Context (1.1.1.1)")
+ax3a.grid(alpha=0.25)
+
+# 4) LAN control
+x4, y_lan = prom_range_any([
+    'avg by () (last_over_time(iperf3_end_sum_received_bits_per_second[6h])) / 1e6',
+    'avg by () (last_over_time(iperf3_end_sum_received_bits_per_second[2h])) / 1e6',
+    'avg by () (iperf3_end_sum_received_bits_per_second) / 1e6',
+], step="1h")
+axes[3].plot(x4, y_lan, label="LAN iperf3 receive", linewidth=1.5, color="tab:green")
+axes[3].set_ylabel("Mbps")
+axes[3].set_title("LAN Control Throughput")
+axes[3].legend(loc="upper right", fontsize=8)
+axes[3].grid(alpha=0.25)
+
+for ax in axes:
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+
+plt.show()
+```
+
+## Evidence Interpretation Notes
+
+- If WAN download stays in a narrow low band across many days while LAN control remains high, this supports sustained line limitation.
+- If severe throughput collapse occurs without matching spikes in packet loss and RTT, that weakens a pure congestion-only explanation.
+- Use wording such as "behavior consistent with throttling or policy-based rate limitation" unless the ISP confirms shaping policy.
+
+## Methodology (Plain English)
+
+How to read this report:
+
+1. The report uses the last 14 days of measurement data.
+2. For WAN throughput, it compares observed download/upload against your contracted rate line.
+3. For reliability, it uses percentile summaries:
+    1. p50 (typical performance)
+    2. p95 (worse-case trend without single outlier spikes)
+4. It includes latency, jitter, and packet loss so throughput drops can be interpreted in context.
+5. It includes LAN control throughput to show local network capacity separately from ISP line performance.
+6. The goal is to show persistent behavior over many days, not isolated single events.
+
+## Technical Appendix
+
+Detailed query definitions are kept in the source file and can be provided to ISP engineering on request.
+
+## Run Commands
+
+```bash
+quarto render docs/isp-evidence-pack.qmd --to pdf
+```
+
+Set plan speed in Mbps (example 300):
+
+```bash
+quarto render docs/isp-evidence-pack.qmd --to pdf -P contracted_download_mbps:300
+```

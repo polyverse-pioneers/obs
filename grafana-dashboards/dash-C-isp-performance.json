@@ -821,13 +821,14 @@
         "list": []
     },
     "time": {
-        "from": "now-7d",
+        "from": "now-14d",
         "to": "now"
     },
     "timepicker": {
         "time_options": [
             "2d",
             "7d",
+            "14d",
             "30d",
             "60d",
             "90d"

@@ -39,3 +39,11 @@ coverage/
 Thumbs.db
 
 backups/
+
+# Python virtual environments
+.venv/
+
+# Quarto generated outputs
+*.html
+*.pdf
+*_files/
