@@ -336,6 +336,10 @@ How to read this report:
 5. It includes LAN control throughput to show local network capacity separately from ISP line performance.
 6. The goal is to show persistent behavior over many days, not isolated single events.
 
+## Network Topology For ISP Call
+
+{{< include spectrum-network.md >}}
+
 ## Technical Appendix
 
 Detailed query definitions are kept in the source file and can be provided to ISP engineering on request.
