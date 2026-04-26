@@ -1,0 +1,64 @@
+
+
+---
+
+## Recommended Public iperf3 Servers
+
+Use **4–6 servers** and rotate **one per run** (e.g., every 15 minutes). Aggregate in Grafana by per‑server, cross‑server **minimum** (authoritative floor), and **average** (context).
+
+> Notes:
+> - Use **fixed duration** and **multi‑stream** for all runs.
+> - Expect occasional noise on any single public server; patterns across servers matter.
+
+### 1) InterServer — Los Angeles (West Coast, low latency)
+- **Host:** `lax.speedtest.is.cc`
+- **Port:** 5201
+- **Why:** Good Spectrum peering; useful local sanity check
+```bash
+iperf3 -c lax.speedtest.is.cc -p 5201 -P 8 -t 20 --json
+```
+
+### 2) InterServer — Dallas (Central US path diversity)
+- **Host:** `dfw.speedtest.is.cc`
+- **Port:** 5201
+- **Why:** Separates regional congestion from local issues
+```bash
+iperf3 -c dfw.speedtest.is.cc -p 5201 -P 8 -t 20 --json
+```
+
+### 3) InterServer — New York / NJ (Long‑haul worst case)
+- **Host:** `nyc.speedtest.is.cc`
+- **Port:** 5201
+- **Why:** Higher RTT; good capacity floor check
+```bash
+iperf3 -c nyc.speedtest.is.cc -p 5201 -P 8 -t 20 --json
+```
+
+### 4) Leaseweb — Hong Kong (High‑BDP stress test)
+- **Host:** `speedtest.hkg12.hk.leaseweb.net`
+- **Port:** 5201
+- **Why:** Exposes TCP behavior under long RTTs
+```bash
+iperf3 -c speedtest.hkg12.hk.leaseweb.net -p 5201 -P 8 -t 20 --json
+```
+
+### 5) Moji / Scaleway — France (Stable EU reference)
+- **Host:** `iperf3.moji.fr`
+- **Port:** 5200
+- **Why:** Consistent European endpoint
+```bash
+iperf3 -c iperf3.moji.fr -p 5200 -P 8 -t 20 --json
+```
+
+### 6) Serverius — Netherlands (EU alternative)
+- **Host:** `speedtest.serverius.net`
+- **Port:** 5002
+- **Why:** Backup EU path when others are busy
+```bash
+iperf3 -c speedtest.serverius.net -p 5002 -P 8 -t 20 --json
+```
+
+### Rotation & Interpretation
+- Run **one server per interval** (e.g., every 15 minutes).
+- Trust the **cross‑server minimum** to detect true WAN capacity issues.
+- Ignore isolated dips on a single server unless corroborated by others and by local counters.
