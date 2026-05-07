@@ -1,39 +1,34 @@
 # Netspeed
 
-Deterministic .NET console speed test tool (download, upload, latency) with JSON output for Telegraf/Prometheus workflows.
+WAN and LAN network observability stack centered on scheduled `iperf3` probes, Telegraf exec ingestion, Prometheus storage, and Grafana dashboards.
 
-## Documentation
+## Current Architecture
 
-- Specification: [docs/build.md](docs/build.md)
-- Implementation plan: [docs/build-impl.md](docs/build-impl.md)
-- Repository workflow and coding rules: [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- Probe runner: `pip-speed-wrapper.sh`
+- Scheduler/collector: Telegraf `inputs.exec`
+- Storage/query: Prometheus
+- Visualization: Grafana dashboards under `grafana-dashboards/`
 
-## Scripts
+The wrapper emits Prometheus-formatted metrics directly, including:
 
-### publish-all
+- `netspeed_download_mbps`
+- `netspeed_upload_mbps`
+- `netspeed_tcp_retransmits`
+- `netspeed_test_duration_seconds`
+- `netspeed_run_success`
+- `netspeed_run_exit_code`
 
-Builds self-contained NativeAOT binaries for both Linux targets:
+Common labels include `endpoint`, `direction`, `protocol`, and `parallel_streams`.
 
-- `linux-x64` output: `publish/linux-x64/pip-speed`
-- `linux-arm64` output: `publish/linux-arm64/pip-speed`
+## Key Scripts
 
-Run:
+### `deploy`
 
-```bash
-./publish-all
-```
-
-Notes:
-
-- The script invokes `dotnet publish` for each runtime identifier.
-- The ARM64 publish uses `clang` (`CC=clang CXX=clang++`).
-
-### deploy
-
-Deploys the iperf3 Telegraf wrapper to a remote host over SSH.
+Deploys the wrapper to a remote host over SSH.
 
 - Default host: `planck-primary`
-- Default destination directory: `/opt/pip-speed`
+- Destination: `/opt/pip-speed/pip-speed-wrapper.sh`
+- Validates remote runtime dependencies (`iperf3`, `jq`)
 
 Run:
 
@@ -41,21 +36,32 @@ Run:
 ./deploy
 ```
 
-What it does:
+### `pip-speed-wrapper.sh`
 
-- Validates the local wrapper script exists.
-- Copies it to the remote host at `/tmp/pip-speed-wrapper.sh` via `scp`.
-- Creates the destination directory with `sudo` if needed.
-- Moves the wrapper to `/opt/pip-speed/pip-speed-wrapper.sh` and sets mode `755`.
+Runs scheduled `iperf3` tests against configured endpoints and prints Prometheus metrics to stdout.
 
-Wrapper runtime requirements:
+Required environment:
 
-- `iperf3` and `jq` installed on the target host.
-- `IPERF3_ENDPOINTS` set in the Telegraf service environment (comma-separated `host[:port]` list).
-- Telegraf input should execute `/opt/pip-speed/pip-speed-wrapper.sh` with `data_format = "prometheus"`.
+- `IPERF3_ENDPOINTS` (comma-separated `host[:port]` values)
 
-Requirements:
+Common tuning environment variables:
 
-- SSH access to the target host.
-- `scp` and `ssh` available locally.
-- `sudo` privileges on the target host.
+- `IPERF3_DURATION_SECONDS`
+- `IPERF3_TIMEOUT_SECONDS`
+- `IPERF3_PARALLEL_STREAMS`
+- `IPERF3_OMIT_SECONDS`
+- `IPERF3_ENABLE_UPLOAD`
+
+## Backups
+
+Planck configuration snapshots live under `backups/` and are synced with rsync.
+
+Workflow reference:
+
+- `backups/rsync.md`
+
+## Docs
+
+- Spec: `docs/build.md`
+- Implementation log: `docs/build-impl.md`
+- Repo workflow guidance: `.github/copilot-instructions.md`
