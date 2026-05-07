@@ -6,29 +6,27 @@ set -euo pipefail
 # ---------------------------------------------
 TARGET_HOST="planck-primary"
 TARGET_DIR="/opt/pip-speed"
-PUBLISH_DIR="publish/linux-arm64"
-BINARY="$PUBLISH_DIR/pip-speed"
 WRAPPER="pip-speed-wrapper.sh"
 
 # ---------------------------------------------
-# Validate binary exists
+# Validate wrapper exists
 # ---------------------------------------------
-if [[ ! -f "$BINARY" ]]; then
-    echo "ERROR: pip-speed binary not found at: $BINARY"
-    exit 1
-fi
-
 if [[ ! -f "$WRAPPER" ]]; then
     echo "ERROR: wrapper script not found at: $WRAPPER"
     exit 1
 fi
 
-echo "==> Deploying pip-speed to $TARGET_HOST:$TARGET_DIR"
+echo "==> Deploying iperf3 wrapper to $TARGET_HOST:$TARGET_DIR"
 
 # ---------------------------------------------
-# Copy binary to remote /tmp
+# Preflight remote access and dependencies
 # ---------------------------------------------
-scp "$BINARY" "$TARGET_HOST:/tmp/pip-speed"
+echo "==> Verifying SSH access and remote dependencies"
+ssh -o BatchMode=yes "$TARGET_HOST" 'command -v iperf3 >/dev/null 2>&1 && command -v jq >/dev/null 2>&1'
+
+# ---------------------------------------------
+# Copy wrapper to remote /tmp
+# ---------------------------------------------
 scp "$WRAPPER" "$TARGET_HOST:/tmp/pip-speed-wrapper.sh"
 
 # ---------------------------------------------
@@ -40,16 +38,14 @@ set -euo pipefail
 # Ensure target directory exists
 sudo mkdir -p "$TARGET_DIR"
 
-# Move binary into place
-sudo mv /tmp/pip-speed "$TARGET_DIR/pip-speed"
+# Move wrapper into place
 sudo mv /tmp/pip-speed-wrapper.sh "$TARGET_DIR/pip-speed-wrapper.sh"
 
 # Ensure executable
-sudo chmod 755 "$TARGET_DIR/pip-speed"
 sudo chmod 755 "$TARGET_DIR/pip-speed-wrapper.sh"
 
-echo "pip-speed installed at $TARGET_DIR/pip-speed"
 echo "wrapper installed at $TARGET_DIR/pip-speed-wrapper.sh"
 EOF
 
 echo "==> Deployment complete."
+echo "==> Ensure Telegraf has IPERF3_ENDPOINTS set (comma-separated host[:port] list)."

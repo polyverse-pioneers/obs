@@ -16,6 +16,7 @@ Progress:
 - Phase 7 in progress on 2026-03-20: add split download timing to isolate ISP path effects. New download timing contract records (1) time-to-first-byte/headers and (2) payload transfer duration, while preserving existing total duration and Mbps output. JSON and Prometheus outputs gain download timing breakdown metrics.
 - Phase 8 completed on 2026-03-20: added optional `--warmup-request` switch to run one unmeasured pre-flight request before timing. Config and backend paths now support warmup for tcpdata/custom backends; parsing/help/spec updated and regression tests added.
 - Phase 9 completed on 2026-03-20: implemented a rate-safe Telegraf wrapper strategy for tcpdata. The wrapper now rotates one download size profile per 15-minute UTC slot, runs both cold and warm measurements for that profile with `--latency-samples 5`, emits run-health metrics even on child failures, and labels outputs for Grafana by `size_profile`, `download_size`, and `run_mode`. Dashboard legends and warmup-delta panels were updated to graph per-size-profile series.
+- Phase 10 completed on 2026-05-06: replaced wrapper runtime dependency on the `pip-speed` tcpdata binary with scheduled `iperf3` probes (reverse mode download, optional forward upload) while preserving Telegraf Prometheus ingestion and run-health metrics. Deployment flow now ships wrapper-only; runtime requires `iperf3`, `jq`, and `IPERF3_ENDPOINTS` in Telegraf environment.
 ## 1. Scope And Decisions
 
 - Runtime: .NET 10.
@@ -174,6 +175,20 @@ Acceptance criteria:
 - New tests pass and existing tests remain green.
 - Existing fields remain backward-compatible.
 - Output includes new split download timing fields/metrics.
+
+## Phase 10 - Telegraf Throughput Probe Migration
+
+1. Replace tcpdata-wrapper invocation pattern with `iperf3` scheduled probing in `pip-speed-wrapper.sh`.
+2. Use reverse-mode (`-R`) tests as download proxy and emit `netspeed_download_mbps` in Prometheus format.
+3. Optionally run forward upload tests and emit `netspeed_upload_mbps`.
+4. Continue emitting `netspeed_run_success` and `netspeed_run_exit_code` so failure visibility is preserved in Grafana.
+5. Update deployment and Telegraf config docs to reflect wrapper-only rollout and required environment variables.
+
+Acceptance criteria:
+- Wrapper no longer depends on `/opt/pip-speed/pip-speed` binary.
+- Telegraf `inputs.exec` remains Prometheus-formatted and interval-based.
+- Run health metrics are emitted for both success and failure cases.
+- Runtime requirements (`iperf3`, `jq`, `IPERF3_ENDPOINTS`) are documented.
 
 ## 4. Test Matrix
 

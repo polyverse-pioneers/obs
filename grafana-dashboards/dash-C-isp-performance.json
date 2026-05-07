@@ -110,7 +110,7 @@
                 {
                     "editorMode": "code",
                     "expr": "last_over_time(prometheus_netspeed_download_mbps[6h])",
-                    "legendFormat": "Download {{size_profile}} {{run_mode}}",
+                    "legendFormat": "{{endpoint}}",
                     "range": true,
                     "refId": "A"
                 }
@@ -208,7 +208,7 @@
                 {
                     "editorMode": "code",
                     "expr": "last_over_time(prometheus_netspeed_upload_mbps[6h])",
-                    "legendFormat": "Upload {{size_profile}} {{run_mode}}",
+                    "legendFormat": "{{endpoint}}",
                     "range": true,
                     "refId": "A"
                 }
@@ -274,7 +274,7 @@
                             }
                         ]
                     },
-                    "unit": "ms"
+                    "unit": "short"
                 },
                 "overrides": []
             },
@@ -305,13 +305,13 @@
             "targets": [
                 {
                     "editorMode": "code",
-                    "expr": "last_over_time(prometheus_netspeed_latency_ms_avg[6h])",
-                    "legendFormat": "Avg {{size_profile}} {{run_mode}}",
+                    "expr": "last_over_time(prometheus_netspeed_tcp_retransmits{direction=\"download\"}[6h])",
+                    "legendFormat": "{{endpoint}}",
                     "range": true,
                     "refId": "A"
                 }
             ],
-            "title": "Latency - Average",
+            "title": "TCP Retransmits - Download",
             "type": "timeseries"
         },
         {
@@ -372,7 +372,7 @@
                             }
                         ]
                     },
-                    "unit": "ms"
+                    "unit": "short"
                 },
                 "overrides": []
             },
@@ -385,9 +385,12 @@
             "id": 4,
             "options": {
                 "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
+                    "calcs": [
+                        "mean",
+                        "max"
+                    ],
+                    "displayMode": "table",
+                    "placement": "right",
                     "showLegend": true
                 },
                 "tooltip": {
@@ -400,13 +403,13 @@
             "targets": [
                 {
                     "editorMode": "code",
-                    "expr": "last_over_time(prometheus_netspeed_latency_ms_jitter[6h])",
-                    "legendFormat": "Jitter {{size_profile}} {{run_mode}}",
+                    "expr": "last_over_time(prometheus_netspeed_tcp_retransmits{direction=\"upload\"}[6h])",
+                    "legendFormat": "{{endpoint}}",
                     "range": true,
                     "refId": "A"
                 }
             ],
-            "title": "Jitter",
+            "title": "TCP Retransmits - Upload",
             "type": "timeseries"
         },
         {
@@ -495,20 +498,20 @@
             "targets": [
                 {
                     "editorMode": "code",
-                    "expr": "last_over_time(prometheus_netspeed_download_ttfb_ms[6h])",
-                    "legendFormat": "TTFB {{size_profile}} {{run_mode}}",
+                    "expr": "last_over_time(prometheus_netspeed_download_mbps[6h])",
+                    "legendFormat": "DL {{endpoint}}",
                     "range": true,
                     "refId": "A"
                 },
                 {
                     "editorMode": "code",
-                    "expr": "last_over_time(prometheus_netspeed_download_transfer_ms[6h])",
-                    "legendFormat": "Transfer Time {{size_profile}} {{run_mode}}",
+                    "expr": "last_over_time(prometheus_netspeed_upload_mbps[6h])",
+                    "legendFormat": "UL {{endpoint}}",
                     "range": true,
                     "refId": "B"
                 }
             ],
-            "title": "Download Timing: TTFB vs Transfer",
+            "title": "Download vs Upload by Endpoint",
             "type": "timeseries"
         },
         {
@@ -593,219 +596,13 @@
             "targets": [
                 {
                     "editorMode": "code",
-                    "expr": "last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"cold\"}[6h])",
-                    "legendFormat": "Cold TTFB {{size_profile}}",
-                    "range": true,
-                    "refId": "A"
-                },
-                {
-                    "editorMode": "code",
-                    "expr": "last_over_time(prometheus_netspeed_download_ttfb_ms{run_mode=\"warm\"}[6h])",
-                    "legendFormat": "Warm TTFB {{size_profile}}",
-                    "range": true,
-                    "refId": "B"
-                }
-            ],
-            "title": "Cache Effects: Cold vs Warm TTFB",
-            "type": "timeseries"
-        },
-        {
-            "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-            },
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisBorderShow": false,
-                        "axisCenteredZero": true,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "barAlignment": 0,
-                        "barWidthFactor": 0.6,
-                        "drawStyle": "line",
-                        "fillOpacity": 0,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "insertNulls": false,
-                        "lineInterpolation": "linear",
-                        "lineWidth": 2,
-                        "pointSize": 5,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "showPoints": "always",
-                        "showValues": false,
-                        "spanNulls": true,
-                        "stacking": {
-                            "group": "A",
-                            "mode": "none"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "red"
-                            },
-                            {
-                                "color": "green",
-                                "value": 0
-                            }
-                        ]
-                    },
-                    "unit": "percent"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 24,
-                "x": 0,
-                "y": 32
-            },
-            "id": 7,
-            "options": {
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": true
-                },
-                "tooltip": {
-                    "hideZeros": false,
-                    "mode": "single",
-                    "sort": "none"
-                }
-            },
-            "pluginVersion": "12.3.3",
-            "targets": [
-                {
-                    "editorMode": "code",
                     "expr": "last_over_time(prometheus_netspeed_run_success[6h])",
-                    "legendFormat": "Success {{size_profile}} {{run_mode}}",
+                    "legendFormat": "{{endpoint}} {{direction}}",
                     "range": true,
                     "refId": "A"
                 }
             ],
-            "title": "ISP Test Success Rate",
-            "type": "timeseries"
-        },
-        {
-            "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-            },
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisBorderShow": false,
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "barAlignment": 0,
-                        "barWidthFactor": 0.6,
-                        "drawStyle": "line",
-                        "fillOpacity": 0,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "insertNulls": false,
-                        "lineInterpolation": "linear",
-                        "lineWidth": 2,
-                        "pointSize": 5,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "showPoints": "always",
-                        "showValues": false,
-                        "spanNulls": true,
-                        "stacking": {
-                            "group": "A",
-                            "mode": "none"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": 0
-                            },
-                            {
-                                "color": "red",
-                                "value": 80
-                            }
-                        ]
-                    },
-                    "unit": "Mbps"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 24,
-                "x": 0,
-                "y": 40
-            },
-            "id": 8,
-            "options": {
-                "legend": {
-                    "calcs": [
-                        "mean",
-                        "max"
-                    ],
-                    "displayMode": "table",
-                    "placement": "right",
-                    "showLegend": true
-                },
-                "tooltip": {
-                    "hideZeros": false,
-                    "mode": "single",
-                    "sort": "none"
-                }
-            },
-            "pluginVersion": "12.3.3",
-            "targets": [
-                {
-                    "editorMode": "code",
-                    "expr": "last_over_time(prometheus_netspeed_download_mbps[6h]) * (last_over_time(prometheus_netspeed_download_ttfb_ms[6h]) + last_over_time(prometheus_netspeed_download_transfer_ms[6h])) / clamp_min(last_over_time(prometheus_netspeed_download_transfer_ms[6h]), 1)",
-                    "legendFormat": "Transfer-only {{size_profile}} {{run_mode}}",
-                    "range": true,
-                    "refId": "A"
-                },
-                {
-                    "editorMode": "code",
-                    "expr": "last_over_time(prometheus_netspeed_download_mbps[6h])",
-                    "legendFormat": "End-to-end {{size_profile}} {{run_mode}}",
-                    "range": true,
-                    "refId": "B"
-                }
-            ],
-            "title": "Download Throughput: Transfer-only vs End-to-end",
+            "title": "Test Success by Endpoint",
             "type": "timeseries"
         }
     ],
@@ -837,6 +634,6 @@
     "timezone": "",
     "title": "ISP Performance",
     "uid": "phase3-dashboard-c",
-    "version": 3,
+    "version": 4,
     "weekStart": ""
 }

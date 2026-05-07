@@ -305,49 +305,44 @@ Notes:
 - CLI auto-populates `metadata.run_mode` as `warm` when `--warmup-request` is enabled, otherwise `cold`.
 - Prometheus output includes metadata as metric labels, so warm/cold filtering can be done with selectors like `{run_mode="warm"}`.
 
-### 5.1.1 Rate-safe Telegraf wrapper strategy
+### 5.1.1 Scheduled iperf3 wrapper strategy
 
-For tcpdata `/speedtest`, request budgeting must account for the burst generated during a single wrapper invocation, not the average across the full Telegraf interval.
+Operational decision (2026-05-06): replace tcpdata wrapper execution with scheduled `iperf3` probing while keeping Telegraf `inputs.exec` and Prometheus-formatted output.
 
-Per run request count:
+Recommended probe model:
 
-- cold run: `latency_samples + 2`
-- warm run: `latency_samples + 3`
-- cold + warm pair: `2 * latency_samples + 5`
+- Telegraf runs wrapper every 15 minutes.
+- Wrapper executes `iperf3` against one or more configured endpoints.
+- Reverse TCP test (`-R`) is the canonical download metric path.
+- Optional forward TCP test captures upload.
+- Wrapper prints Prometheus metrics and exits `0` even on probe failure so Telegraf can ingest run-health fields.
 
-Approved operational strategy for the 15-minute Telegraf schedule:
+Required runtime configuration:
 
-- Run exactly one download size profile per 15-minute interval.
-- For that selected profile, run both:
-    - cold measurement
-    - warm measurement (`--warmup-request`)
-- Reduce `--latency-samples` to `5` for wrapper-driven telemetry collection.
-- Emit metadata labels for each invocation:
-    - `run_mode=cold|warm`
-    - `size_profile=small|medium|large`
-    - `download_size=<bytes>`
+- Environment variable `IPERF3_ENDPOINTS` with comma-separated `host[:port]` values.
+- `iperf3` and `jq` installed on the probe host.
 
-Default rotating size profiles:
+Optional runtime configuration:
 
-- `small`: `1048576` bytes
-- `medium`: `5242880` bytes
-- `large`: `10485760` bytes
+- `IPERF3_ENABLE_UPLOAD` (`1` by default).
+- `IPERF3_DURATION_SECONDS` (`30` default).
+- `IPERF3_PARALLEL_STREAMS` (`1` default).
+- `IPERF3_OMIT_SECONDS` (`2` default).
 
-Constraint:
+Emitted metric model:
 
-- tcpdata documents a maximum download `size` of `10MB` on `/speedtest`, so wrapper-managed download profiles must not exceed `10485760` bytes.
-
-Rotation behavior:
-
-- The Telegraf wrapper rotates profiles by 15-minute UTC slot.
-- Slot 0 uses `small`, slot 1 uses `medium`, slot 2 uses `large`, then repeats.
-- This yields one full size-profile cycle every 45 minutes while keeping the burst under the tcpdata request limit.
+- `netspeed_download_mbps{endpoint,protocol="tcp",parallel_streams}`
+- `netspeed_upload_mbps{endpoint,protocol="tcp",parallel_streams}` (when upload enabled)
+- `netspeed_test_duration_seconds{endpoint,direction,protocol="tcp"}`
+- `netspeed_tcp_retransmits{endpoint,direction,protocol="tcp"}`
+- `netspeed_run_success{endpoint,direction,protocol="tcp"}`
+- `netspeed_run_exit_code{endpoint,direction,protocol="tcp"}`
 
 Grafana guidance:
 
-- Chart download/TTFB series grouped by `size_profile` and `run_mode`.
-- Compute warmup benefit deltas per `size_profile`, not across all profiles combined.
-- Use run-health metrics to show missing or failed runs separately from performance panels.
+- Use `endpoint` label to compare path variance and detect source bottlenecks.
+- Prefer reverse-test (`direction="download"`) series for ISP download trend analysis.
+- Keep run-health panels adjacent to throughput panels to avoid mistaking probe failures for low throughput.
 
 ## 5.2 Text (human-readable)
 

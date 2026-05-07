@@ -30,9 +30,8 @@ Notes:
 
 ### deploy
 
-Deploys the ARM64 binary to a remote host over SSH.
+Deploys the iperf3 Telegraf wrapper to a remote host over SSH.
 
-- Source binary: `publish/linux-arm64/pip-speed`
 - Default host: `planck-primary`
 - Default destination directory: `/opt/pip-speed`
 
@@ -44,10 +43,16 @@ Run:
 
 What it does:
 
-- Validates the local binary exists.
-- Copies it to the remote host at `/tmp/pip-speed` via `scp`.
+- Validates the local wrapper script exists.
+- Copies it to the remote host at `/tmp/pip-speed-wrapper.sh` via `scp`.
 - Creates the destination directory with `sudo` if needed.
-- Moves the binary to `/opt/pip-speed/pip-speed` and sets mode `755`.
+- Moves the wrapper to `/opt/pip-speed/pip-speed-wrapper.sh` and sets mode `755`.
+
+Wrapper runtime requirements:
+
+- `iperf3` and `jq` installed on the target host.
+- `IPERF3_ENDPOINTS` set in the Telegraf service environment (comma-separated `host[:port]` list).
+- Telegraf input should execute `/opt/pip-speed/pip-speed-wrapper.sh` with `data_format = "prometheus"`.
 
 Requirements:
 
