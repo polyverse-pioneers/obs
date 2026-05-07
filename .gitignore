@@ -38,7 +38,8 @@ coverage/
 .DS_Store
 Thumbs.db
 
-backups/
+# Planck backup runtime state (large/churny)
+backups/var/
 
 # Python virtual environments
 .venv/

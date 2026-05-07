@@ -1,0 +1,32 @@
+auths:
+  public_v2:
+    community: public
+    security_level: noAuthNoPriv
+    version: 2
+
+modules:
+  mikrotik_mib2:
+    walk:
+      - 1.3.6.1.2.1.1          # system
+      - 1.3.6.1.2.1.2          # interfaces
+      - 1.3.6.1.2.1.31.1.1     # ifXTable (HC counters, ifName)
+    lookups:
+      - source_indexes: [ifIndex]
+        lookup: ifName
+      - source_indexes: [ifIndex]
+        lookup: ifDescr
+    overrides:
+      ifName:
+        ignore: false
+      ifDescr:
+        ignore: false
+      ifHCInOctets:
+        ignore: false
+      ifHCOutOctets:
+        ignore: false
+      ifHighSpeed:
+        ignore: false
+      ifOperStatus:
+        ignore: false
+      ifAdminStatus:
+        ignore: false
