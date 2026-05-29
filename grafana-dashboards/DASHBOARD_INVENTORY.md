@@ -241,6 +241,6 @@
 1. **Validate current metrics**: Query Prometheus against live data to determine actual metric names and labels
 2. **Consolidate redundancy**: Merge dashboards 1 & 18 latency sections into unified "Network Health Overview" (Phase 3 Dashboard A)
 3. **Fix query names**: Update queries to match actual Telegraf/Blackbox output
-4. **Remove broken dashboards**: Archive 3, 4, 5, 6 as legacy; rebuild as Phase 3 Dashboard B (Internal Performance)
+4. **Remove broken dashboards**: Archive 3, 4, 5, 6 as legacy; Phase 3 Dashboard B is now DNS Resolver Operations
 5. **Extend Netspeed**: Keep Dashboard 8 as reference; create Phase 3 Dashboard C (ISP Performance) and D (Evidence Pack)
 

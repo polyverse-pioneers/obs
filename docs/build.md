@@ -55,6 +55,17 @@ Expected labels:
 
 ## 7. Dashboard Requirements
 
+Dashboard B (`phase3-dashboard-b`) should visualize DNS resolver health using the
+Unbound and `dns_query` metrics collected from Planck.
+
+Required dashboard coverage:
+
+- Synthetic local lookup latency by probe/domain
+- Synthetic lookup result codes or failures
+- Resolver query volume and recursive reply rate
+- Cache hit ratio and hit/miss rates
+- Recursion timing and requestlist pressure
+
 Dashboard C (`phase3-dashboard-c`) should visualize:
 
 - Download throughput by endpoint
@@ -68,3 +79,42 @@ Dashboard C (`phase3-dashboard-c`) should visualize:
 - Planck config snapshots are captured via `backups/planck.list` and rsync.
 - `backups/var/` remains ignored to avoid runtime database churn.
 - Backup sync workflow is documented in `backups/rsync.md`.
+
+## 9. DNS Monitoring Requirements
+
+Planck also runs a local Unbound resolver that must be observable through the existing
+Telegraf -> Prometheus -> Grafana path.
+
+Required collection:
+
+- Telegraf `inputs.unbound` for resolver activity, cache behavior, and recursion timing.
+- Telegraf `inputs.dns_query` against `127.0.0.1:53` for a lightweight synthetic resolver health check.
+
+Minimum metrics expected in Prometheus:
+
+- `unbound_total_num_queries`
+- `unbound_total_num_cachehits`
+- `unbound_total_num_cachemiss`
+- `unbound_total_num_recursivereplies`
+- `unbound_total_recursion_time_avg`
+- `dns_query_query_time_ms`
+- `dns_query_result_code`
+- `dns_query_rcode_value`
+
+Expected labels/tags for DNS metrics:
+
+- `service=unbound`
+- `resolver=planck-local`
+- `thread` on thread-scoped Unbound metrics
+- `domain`, `record_type`, `server`, `result`, and `rcode` on synthetic DNS query metrics
+
+Operational requirement:
+
+- The Telegraf runtime user must be able to execute `unbound-control` successfully, preferably by membership in the `unbound` group.
+
+## 10. Internal UI Naming Requirements
+
+- Internal-only services that should be reachable by household devices without custom CA rollout should use a reserved internal namespace outside any public-domain HSTS tree.
+- Internal web UIs should live under `*.spinrikolab.home.arpa` rather than under any public-domain suffix.
+- Grafana should be reachable at `http://grafana.spinrikolab.home.arpa/` through Planck's local DNS and nginx reverse proxy.
+- Browser-facing internal services should not depend on public-domain aliases once the internal namespace cutover is complete.

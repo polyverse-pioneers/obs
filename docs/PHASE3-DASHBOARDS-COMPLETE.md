@@ -21,18 +21,19 @@
 **Refresh:** 10s
 **Time Range:** Last 15 minutes
 
-### Dashboard B: Internal Network Performance
+### Dashboard B: DNS Resolver Operations
 **UID:** `phase3-dashboard-b`
 **File:** `dash-B-internal-performance.json`
-**Purpose:** iperf3 throughput + quality metrics for LAN testing
-**Source:** Consolidated from Dashboard 18 (iperf3 section)
+**Purpose:** DNS resolver health, cache behavior, and synthetic lookup monitoring
+**Source:** Unbound + Telegraf `dns_query` telemetry
 **Panels:**
-- Throughput sent/received (Mbps with mean/max stats)
-- Sender RTT mean (ms)
-- Retransmitted packets count
-**Queries:** iperf3_end_sum_{sent|received}_bits_per_second, iperf3_end_streams_0_sender_mean_rtt, iperf3_end_sum_sent_retransmits (all validated ✅)
+- Resolver query rate and cache hit ratio
+- Synthetic lookup latency and result codes
+- Recursion timing and requestlist pressure
+- Thread query distribution and resolver exception rates
+**Queries:** `unbound_*` and `dns_query_*` (validated ✅)
 **Refresh:** 30s
-**Time Range:** Last 24 hours
+**Time Range:** Last 6 hours
 
 ### Dashboard C: ISP Performance
 **UID:** `phase3-dashboard-c`
@@ -78,7 +79,7 @@
 | Dashboard 5: Router Interfaces | ⚠️ Label mismatch | Defer - SNMP metrics present but require label mapping |
 | Dashboard 6: Wireless & Bridge/FDB | ❌ No Data (not configured) | Archive - bridge metrics not in Telegraf, zero bridgePorts_* metrics |
 | Dashboard 8: Netspeed Correlation | ✅ Working | Split into Dashboard C (ISP Performance) + Dashboard D (Evidence Pack) |
-| Dashboard 18: Latency & Throughput | ✅ Working | Consolidate into Dashboard A (RTT) + Dashboard B (iperf3) |
+| Dashboard 18: Latency & Throughput | ✅ Working | Consolidate RTT into Dashboard A; iperf3-specific views superseded |
 
 ## Metrics Validated ✅
 
@@ -116,10 +117,14 @@
 - `probe_icmp_duration_seconds{instance}`
 
 ### Dashboard B
-- `iperf3_end_sum_sent_bits_per_second`
-- `iperf3_end_sum_received_bits_per_second`
-- `iperf3_end_streams_0_sender_mean_rtt`
-- `iperf3_end_sum_sent_retransmits`
+- `unbound_total_num_queries`
+- `unbound_total_num_cachehits`
+- `unbound_total_num_cachemiss`
+- `unbound_total_recursion_time_avg`
+- `unbound_total_requestlist_current_all`
+- `unbound_threads_num_queries`
+- `dns_query_query_time_ms`
+- `dns_query_result_code`
 
 ### Dashboard C
 - `prometheus_netspeed_download_mbps{size_profile,run_mode}`

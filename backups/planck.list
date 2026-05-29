@@ -1,6 +1,8 @@
 /etc/telegraf/telegraf.conf
 /etc/telegraf/telegraf.d/
 /etc/systemd/system/telegraf.service.d/
+/etc/unbound/
+/etc/nginx/
 /etc/grafana/grafana.ini
 /var/lib/grafana/grafana.db
 /etc/prometheus/prometheus.yml

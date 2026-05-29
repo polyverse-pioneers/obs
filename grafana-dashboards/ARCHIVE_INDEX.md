@@ -14,16 +14,19 @@
 | dash_5.json | router-interfaces | Router Interfaces | SNMP label mapping issue (18 interface metrics present but label structure differs) | ⚠️ Broken (defer) |
 | dash_6.json | wire-bridge | Wireless & Bridge / FDB | No bridge/FDB metrics configured (zero bridgePorts_* in Prometheus) | ❌ No Data |
 | dash_8.json | 50646b57-ac77-43f4-8d96-6bb6515bcaa5 | Netspeed Correlation | Split into Dashboard C (ISP Performance) + Dashboard D (Evidence Pack) | ✅ Working (split) |
-| dash_18.json | b9ed9f68-a1f0-4225-b2a1-b3138696a0c4 | Latency & Throughput (Legacy) | Split into Dashboard A (RTT/ping) + Dashboard B (iperf3) | ✅ Working (split) |
+| dash_18.json | b9ed9f68-a1f0-4225-b2a1-b3138696a0c4 | Latency & Throughput (Legacy) | Split into Dashboard A (RTT/ping); iperf3 views later superseded | ✅ Working (split) |
 
 ## Migration Summary
 
 **Consolidated Fully:**
 - ✅ Dashboard 1 → Dashboard A (Network Health Overview)
-- ✅ Dashboard 18 → Dashboard A (RTT sections) + Dashboard B (iperf3 sections)
+- ✅ Dashboard 18 → Dashboard A (RTT sections)
 
 **Split into Separate Dashboards:**
 - ✅ Dashboard 8 → Dashboard C (ISP Performance) + Dashboard D (Evidence Pack)
+
+**Replaced With New Observability Surface:**
+- ✅ Dashboard B rewritten as DNS Resolver Operations for Unbound and synthetic DNS telemetry
 
 **Archived (Out of Scope for Phase 3):**
 - Dashboard 2: Agent health monitoring (system-level metrics, needs variable fixes)
@@ -52,6 +55,6 @@ Then import via Grafana UI or API.
 
 These replace the archived set:
 - **dash-A-network-health.json** (UID: `phase3-dashboard-a`)
-- **dash-B-internal-performance.json** (UID: `phase3-dashboard-b`)
+- **dash-B-internal-performance.json** (UID: `phase3-dashboard-b`) - DNS Resolver Operations
 - **dash-C-isp-performance.json** (UID: `phase3-dashboard-c`)
 - **dash-D-evidence-pack.json** (UID: `phase3-dashboard-d`)

@@ -56,14 +56,14 @@ Panels:
 - Jitter/variance trend (where available).
 - Uptime/success indicators for probes.
 
-### Dashboard B: Internal Network Performance
+### Dashboard B: DNS Resolver Operations
 Questions answered:
-- Are internal links/devices saturating or unstable?
-- Is throughput degradation inside the LAN?
+- Is the local resolver answering quickly and consistently?
+- Are cache efficiency or recursion timings degrading?
 Panels:
-- iperf throughput by managed device.
-- Retransmits and RTT/RTT variance by managed device.
-- Interface error/discard counters on key hosts.
+- Synthetic lookup latency by probe/domain.
+- Synthetic result codes and failing checks.
+- Resolver query volume, cache hit ratio, recursion time, and requestlist pressure.
 
 ### Dashboard C: ISP Performance and Comparison
 Questions answered:

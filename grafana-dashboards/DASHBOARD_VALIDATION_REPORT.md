@@ -185,15 +185,16 @@
 
 **Metrics:** All exist ✅
 
-### Dashboard B: Internal Network Performance
-**From:** Dashboard 18 (iperf3) + Dashboard 5 (fixed)
+### Dashboard B: DNS Resolver Operations
+**From:** Unbound resolver stats + Telegraf `dns_query` health checks
 
 **Panels:**
-1. iperf3 Throughput by Managed Device
-2. Retransmits and RTT/RTT Variance
-3. Interface Error/Discard Counters (work on label mappings)
+1. Resolver query volume and recursive reply rate
+2. Cache hit/miss rates and cache hit ratio
+3. Synthetic lookup latency and result codes
+4. Recursion timing, requestlist pressure, and thread query distribution
 
-**Metrics:** Available (need label fixes for 5)
+**Metrics:** `unbound_*` and `dns_query_*` present ✅
 
 ### Dashboard C: ISP Performance and Comparison
 **Extend:** Dashboard 8 (Netspeed Correlation)
