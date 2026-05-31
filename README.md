@@ -52,6 +52,26 @@ Common tuning environment variables:
 - `IPERF3_OMIT_SECONDS`
 - `IPERF3_ENABLE_UPLOAD`
 
+### `scripts/dns_activity_observer.py`
+
+Summarizes recent Unbound query/reply logs into bounded Prometheus metrics for
+top query names and top upstream DNS destinations.
+
+Expected runtime shape:
+
+- Run from Telegraf `inputs.exec`
+- Read recent `unbound` journal lines
+- Emit only rolling top-N gauges, not raw query events
+- Deploy the script to `/opt/obs/dns_activity_observer.py` on Planck, or adjust
+  the tracked Telegraf command path to match the installed location
+
+Key environment variables:
+
+- `DNS_ACTIVITY_WINDOW`
+- `DNS_ACTIVITY_TOP_N`
+- `DNS_ACTIVITY_IGNORE_SUFFIXES`
+- `DNS_ACTIVITY_UPSTREAM_LABELS`
+
 ## Backups
 
 Planck configuration snapshots live under `backups/` and are synced with rsync.

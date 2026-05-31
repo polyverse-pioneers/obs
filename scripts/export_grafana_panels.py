@@ -91,9 +91,11 @@ def main() -> int:
 
     dashboard_files = [
         dashboards_dir / "dash-A-network-health.json",
-        dashboards_dir / "dash-B-internal-performance.json",
+        dashboards_dir / "dash-B-dns-resolver-operations.json",
         dashboards_dir / "dash-C-isp-performance.json",
         dashboards_dir / "dash-D-evidence-pack.json",
+        dashboards_dir / "dash-E-planck-capacity-headroom.json",
+        dashboards_dir / "dash-F-dns-activity-observer.json",
     ]
 
     failures = 0

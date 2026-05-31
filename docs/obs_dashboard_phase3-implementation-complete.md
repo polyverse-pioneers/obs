@@ -1,46 +1,70 @@
 # Phase 3: Consolidated Dashboards - Implementation Complete
 
-**Status:** ✅ COMPLETE - All 4 Phase 3 dashboards created with stable UIDs and consolidated queries
+**Status:** ✅ COMPLETE - All 6 Phase 3 dashboards created with stable UIDs and consolidated queries
 
 **Created:** 2026-03-21
 
 ## Dashboard Summary
 
 ### Dashboard A: Network Health Overview
+
 **UID:** `phase3-dashboard-a`
+
 **File:** `dash-A-network-health.json`
+
 **Purpose:** External ping status + internal/external RTT monitoring
+
 **Consolidation:** Merges Dashboard 1 (ping status) + Dashboard 18 (blackbox ICMP RTT)
+
 **Panels:**
+
 - External ping status indicators (4 targets: 1.1.1.1, 8.8.8.8, 1.0.0.1, 208.67.222.222)
 - Ping latency metrics (average, maximum, jitter)
 - Packet loss (%)
 - Internal RTT to non-IP hosts
 - External RTT to IP addresses
-**Queries:** All ping_* and probe_icmp_* metrics (validated ✅)
+
+**Queries:** All `ping_*` and `probe_icmp_*` metrics (validated ✅)
+
 **Refresh:** 10s
+
 **Time Range:** Last 15 minutes
 
 ### Dashboard B: DNS Resolver Operations
+
 **UID:** `phase3-dashboard-b`
-**File:** `dash-B-internal-performance.json`
+
+**File:** `dash-B-dns-resolver-operations.json`
+
 **Purpose:** DNS resolver health, cache behavior, and synthetic lookup monitoring
+
 **Source:** Unbound + Telegraf `dns_query` telemetry
+
 **Panels:**
+
 - Resolver query rate and cache hit ratio
 - Synthetic lookup latency and result codes
 - Recursion timing and requestlist pressure
 - Thread query distribution and resolver exception rates
+
 **Queries:** `unbound_*` and `dns_query_*` (validated ✅)
+
 **Refresh:** 30s
+
 **Time Range:** Last 6 hours
 
 ### Dashboard C: ISP Performance
+
 **UID:** `phase3-dashboard-c`
+
 **File:** `dash-C-isp-performance.json`
+
 **Purpose:** WAN performance analysis with ISP metrics (pip-speed)
+
 **Source:** Refactored from Dashboard 8 (Netspeed Correlation)
+
 **Panels:**
+
 - Download throughput (Mbps) with mean/max
 - Upload throughput (Mbps) with mean/max
 - Average latency (ms)
@@ -48,30 +72,89 @@
 - TTFB vs transfer time breakdown
 - Cache effects: cold vs warm TTFB comparison
 - ISP test success rate
+
 **Queries:** All prometheus_netspeed_* metrics (download_mbps, upload_mbps, latency_ms_avg, latency_ms_jitter, download_ttfb_ms, download_transfer_ms, run_success) - all validated ✅
+
 **Refresh:** 30s
+
 **Time Range:** Last 7 days
 
 ### Dashboard D: Evidence Pack & SLA Metrics
+
 **UID:** `phase3-dashboard-d`
+
 **File:** `dash-D-evidence-pack.json`
+
 **Purpose:** SLA metrics, export-friendly stats, and daily reporting
+
 **Source:** Refactored from Dashboard 8 (Netspeed Correlation) with added aggregations
+
 **Panels:**
+
 - Time composition pie charts (cold and warm download breakdowns)
 - Daily run success rate (stacked bar chart)
 - Small profile download statistics (24h aggregates)
 - Small profile latency statistics (24h aggregates)
 - TTFB SLA metrics (P95/P99 percentiles)
 - Latest snapshots: download Mbps, latency, TTFB, 24h success rate
+
 **Queries:** All prometheus_netspeed_* metrics with histogram_quantile aggregations (all validated ✅)
+
 **Refresh:** 30s
+
 **Time Range:** Last 7 days
+
+### Dashboard E: Planck Capacity & Service Headroom
+
+**UID:** `phase3-dashboard-e`
+
+**File:** `dash-E-planck-capacity-headroom.json`
+
+**Purpose:** Admission gate for deciding whether Planck can safely host RAG alongside DNS and WireGuard
+
+**Source:** Node exporter `node_*` metrics plus Unbound and Telegraf `dns_query` signals
+
+**Panels:**
+
+- Admission decision stat driven by CPU, load/core, free memory, iowait, and DNS latency guardrails
+- CPU busy and iowait trend
+- Load-per-core trend
+- Memory/swap headroom and thermal trend
+- DNS latency, success ratio, resolver query volume, and recursion timing
+- `wg0` and overall host network throughput
+
+**Queries:** `node_*`, `unbound_*`, and `dns_query_*` metrics (expected from current Planck Prometheus configuration)
+
+**Refresh:** 30s
+
+**Time Range:** Last 6 hours
+
+### Dashboard F: DNS Activity Observer
+
+**UID:** `phase3-dashboard-f`
+
+**File:** `dash-F-dns-activity-observer.json`
+
+**Purpose:** Bounded DNS activity summaries for top query names and upstream DNS destinations on Planck
+
+**Source:** Unbound query/reply logs summarized by a Telegraf `inputs.exec` exporter
+
+**Panels:**
+
+- Observer scrape status and recent journal coverage
+- Top query names by count and share
+- Top upstream DNS destinations by count and share
+
+**Queries:** `dns_activity_observer_*` metrics emitted by the DNS activity exporter
+
+**Refresh:** 30s
+
+**Time Range:** Last 24 hours
 
 ## Migration Path From Old Dashboards
 
 | Old Dashboard | Status | Migration Path |
-|---|---|---|
+| --- | --- | --- |
 | Dashboard 1: Network Health & Alerts | ✅ Working | Consolidate into Dashboard A |
 | Dashboard 2: Exporter & Agent Health | ⚠️ Partial (variable issues) | Archive - metrics mostly node_* exporter, out of scope |
 | Dashboard 3: DHCP & Routes | ❌ No Data (not configured) | Archive - infrastructure gap, DHCP inputs not in Telegraf |
@@ -84,6 +167,7 @@
 ## Metrics Validated ✅
 
 **All core metrics confirmed present in Prometheus (975 total):**
+
 - ✅ ping_* (19 metrics)
 - ✅ probe_* (7 metrics)
 - ✅ iperf3_* (276 metrics)
@@ -92,7 +176,7 @@
 
 ## Implementation Notes
 
-1. **Stable UIDs:** All new dashboards use `phase3-dashboard-{a,b,c,d}` UIDs for easy referencing and not conflicting with old dashboard IDs
+1. **Stable UIDs:** All new dashboards use `phase3-dashboard-{a,b,c,d,e,f}` UIDs for easy referencing and not conflicting with old dashboard IDs
 2. **Query Cleanup:** Removed fallback query chains (e.g., 5-variant iperf3 queries reduced to primary metric)
 3. **Variables:** Dashboard C/D use template variables for filtering (size_profile, run_mode) when applicable
 4. **Refresh Rates:** Optimized per use case (10s for health monitors, 30s for aggregates)
@@ -109,6 +193,7 @@
 ## Metrics Used Per Dashboard
 
 ### Dashboard A
+
 - `ping_result_code{url}`
 - `ping_average_response_ms`
 - `ping_maximum_response_ms`
@@ -117,6 +202,7 @@
 - `probe_icmp_duration_seconds{instance}`
 
 ### Dashboard B
+
 - `unbound_total_num_queries`
 - `unbound_total_num_cachehits`
 - `unbound_total_num_cachemiss`
@@ -127,6 +213,7 @@
 - `dns_query_result_code`
 
 ### Dashboard C
+
 - `prometheus_netspeed_download_mbps{size_profile,run_mode}`
 - `prometheus_netspeed_upload_mbps{size_profile,run_mode}`
 - `prometheus_netspeed_latency_ms_avg{size_profile,run_mode}`
@@ -136,9 +223,37 @@
 - `prometheus_netspeed_run_success{size_profile,run_mode}`
 
 ### Dashboard D
+
 - `prometheus_netspeed_download_ttfb_ms`
 - `prometheus_netspeed_download_transfer_ms`
 - `prometheus_netspeed_run_success`
 - `prometheus_netspeed_run_exit_code`
 - `prometheus_netspeed_download_mbps`
 - `prometheus_netspeed_latency_ms_avg`
+
+### Dashboard E
+
+- `node_cpu_seconds_total`
+- `node_load1`
+- `node_load5`
+- `node_memory_MemAvailable_bytes`
+- `node_memory_SwapFree_bytes`
+- `node_thermal_zone_temp`
+- `node_network_receive_bytes_total`
+- `node_network_transmit_bytes_total`
+- `unbound_total_num_queries`
+- `unbound_total_num_recursivereplies`
+- `unbound_total_recursion_time_avg`
+- `dns_query_query_time_ms`
+- `dns_query_result_code`
+
+### Dashboard F
+
+- `dns_activity_observer_scrape_success`
+- `dns_activity_observer_journal_lines`
+- `dns_activity_observer_query_events`
+- `dns_activity_observer_upstream_events`
+- `dns_activity_observer_top_query_count`
+- `dns_activity_observer_top_query_share`
+- `dns_activity_observer_top_upstream_count`
+- `dns_activity_observer_top_upstream_share`

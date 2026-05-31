@@ -66,6 +66,18 @@ Required dashboard coverage:
 - Cache hit ratio and hit/miss rates
 - Recursion timing and requestlist pressure
 
+Dashboard F (`phase3-dashboard-f`) should visualize bounded DNS activity
+summaries for Planck without turning Prometheus into a raw query log store.
+
+Required dashboard coverage:
+
+- Observer scrape health and recent journal coverage
+- Top query names by count and share over the configured rolling window
+- Top outbound upstream DNS destinations by count and share over the configured
+  rolling window
+- Upstream destination hostname labels where explicit aliases or reverse lookups
+  are available
+
 Dashboard C (`phase3-dashboard-c`) should visualize:
 
 - Download throughput by endpoint
@@ -73,6 +85,23 @@ Dashboard C (`phase3-dashboard-c`) should visualize:
 - TCP retransmits by endpoint (download and upload)
 - Combined download vs upload comparison
 - Run success by endpoint/direction
+
+Dashboard E (`phase3-dashboard-e`) should visualize whether Planck still has
+enough service headroom to take on RAG workloads without hurting DNS or
+WireGuard.
+
+Required dashboard coverage:
+
+- Admission-gate summary based on CPU busy, load per core, free memory, iowait,
+  and DNS latency guardrails
+- CPU busy and iowait trends
+- Load-per-core trends
+- Memory and swap headroom
+- Thermal trend for the Pi host
+- Synthetic DNS latency, DNS success ratio, resolver query volume, and recursion
+  timing
+- `wg0` traffic and overall host network throughput as WireGuard-adjacent health
+  signals
 
 ## 8. Backup Requirements
 
@@ -89,6 +118,8 @@ Required collection:
 
 - Telegraf `inputs.unbound` for resolver activity, cache behavior, and recursion timing.
 - Telegraf `inputs.dns_query` against `127.0.0.1:53` for a lightweight synthetic resolver health check.
+- Telegraf `inputs.exec` running a bounded DNS activity summarizer over recent
+  Unbound query/reply logs.
 
 Minimum metrics expected in Prometheus:
 
@@ -100,6 +131,26 @@ Minimum metrics expected in Prometheus:
 - `dns_query_query_time_ms`
 - `dns_query_result_code`
 - `dns_query_rcode_value`
+- `dns_activity_observer_scrape_success`
+- `dns_activity_observer_journal_lines`
+- `dns_activity_observer_query_events`
+- `dns_activity_observer_upstream_events`
+- `dns_activity_observer_top_query_count`
+- `dns_activity_observer_top_query_share`
+- `dns_activity_observer_top_upstream_count`
+- `dns_activity_observer_top_upstream_share`
+- `node_cpu_seconds_total`
+- `node_load1`
+- `node_load5`
+- `node_memory_MemAvailable_bytes`
+- `node_memory_SwapFree_bytes`
+- `node_network_receive_bytes_total`
+- `node_network_transmit_bytes_total`
+
+Recommended host metrics for the admission gate:
+
+- `node_thermal_zone_temp`
+- `node_disk_io_time_seconds_total`
 
 Expected labels/tags for DNS metrics:
 
@@ -107,10 +158,15 @@ Expected labels/tags for DNS metrics:
 - `resolver=planck-local`
 - `thread` on thread-scoped Unbound metrics
 - `domain`, `record_type`, `server`, `result`, and `rcode` on synthetic DNS query metrics
+- `rank`, `qname`, and `qtype` on DNS activity query-summary metrics
+- `rank`, `upstream_ip`, and `upstream_name` on DNS activity upstream-summary metrics
 
 Operational requirement:
 
 - The Telegraf runtime user must be able to execute `unbound-control` successfully, preferably by membership in the `unbound` group.
+- The Telegraf runtime user must also be able to read recent Unbound logs,
+  preferably by membership in the `systemd-journal` group when journald is the
+  log source.
 
 ## 10. Internal UI Naming Requirements
 

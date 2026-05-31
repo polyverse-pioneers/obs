@@ -13,6 +13,8 @@ notes together.
 | B | [../inventory/obs_dashboard_dns-resolver-operations.md](../inventory/obs_dashboard_dns-resolver-operations.md) | `grafana-dashboards/dash-B-dns-resolver-operations.json` | `phase3-dashboard-b` | DNS resolver operations |
 | C | [../inventory/obs_dashboard_isp-performance.md](../inventory/obs_dashboard_isp-performance.md) | `grafana-dashboards/dash-C-isp-performance.json` | `phase3-dashboard-c` | ISP performance |
 | D | [../inventory/obs_dashboard_evidence-pack.md](../inventory/obs_dashboard_evidence-pack.md) | `grafana-dashboards/dash-D-evidence-pack.json` | `phase3-dashboard-d` | Evidence pack and SLA metrics; retirement candidate |
+| E | [../inventory/obs_dashboard_planck-capacity-headroom.md](../inventory/obs_dashboard_planck-capacity-headroom.md) | `grafana-dashboards/dash-E-planck-capacity-headroom.json` | `phase3-dashboard-e` | Planck capacity and service headroom |
+| F | [../inventory/obs_dashboard_dns-activity-observer.md](../inventory/obs_dashboard_dns-activity-observer.md) | `grafana-dashboards/dash-F-dns-activity-observer.json` | `phase3-dashboard-f` | DNS activity observer |
 
 ## Related Docs
 
