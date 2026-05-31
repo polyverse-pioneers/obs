@@ -94,6 +94,15 @@ def should_ignore_qname(qname: str, ignored_suffixes: Iterable[str]) -> bool:
     return False
 
 
+def should_ignore_exact_qname(qname: str, ignored_names: Iterable[str]) -> bool:
+    normalized = normalize_qname(qname)
+    for name in ignored_names:
+        clean_name = name.strip().rstrip(".").lower()
+        if clean_name and normalized == clean_name:
+            return True
+    return False
+
+
 def extract_query(line: str) -> tuple[str, str] | None:
     for pattern in QUERY_PATTERNS:
         match = pattern.search(line)
@@ -170,6 +179,10 @@ def main() -> int:
         "DNS_ACTIVITY_IGNORE_SUFFIXES",
         "home.spinriko.com,home.polyversepioneers.org,home.polyversepioneers.com,spinrikolab.home.arpa",
     ).split(",")]
+    ignored_names = [item.strip() for item in os.getenv(
+        "DNS_ACTIVITY_IGNORE_NAMES",
+        "heisenberg,hawking,bohr,cloudflare.com,google.com,github.com,example.com,speedtest.nyc1.us.leaseweb.net",
+    ).split(",")]
     upstream_aliases = parse_upstream_labels(os.getenv("DNS_ACTIVITY_UPSTREAM_LABELS", ""))
 
     try:
@@ -188,7 +201,7 @@ def main() -> int:
 
     for line in lines:
         query = extract_query(line)
-        if query and not should_ignore_qname(query[0], ignored_suffixes):
+        if query and not should_ignore_exact_qname(query[0], ignored_names) and not should_ignore_qname(query[0], ignored_suffixes):
             query_counts[query] += 1
 
         upstream_ip = extract_upstream_ip(line)

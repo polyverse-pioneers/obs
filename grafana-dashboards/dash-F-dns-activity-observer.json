@@ -18,6 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 25,
   "links": [],
   "panels": [
     {
@@ -43,6 +44,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -87,7 +89,7 @@
       "pluginVersion": "12.3.3",
       "targets": [
         {
-          "expr": "dns_activity_observer_scrape_success",
+          "expr": "prometheus_dns_activity_observer_scrape_success",
           "legendFormat": "scrape ok",
           "refId": "A"
         }
@@ -105,6 +107,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -145,7 +148,7 @@
       "pluginVersion": "12.3.3",
       "targets": [
         {
-          "expr": "dns_activity_observer_journal_lines",
+          "expr": "prometheus_dns_activity_observer_journal_lines",
           "legendFormat": "journal lines",
           "refId": "A"
         }
@@ -163,6 +166,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -203,7 +207,7 @@
       "pluginVersion": "12.3.3",
       "targets": [
         {
-          "expr": "dns_activity_observer_query_events",
+          "expr": "prometheus_dns_activity_observer_query_events",
           "legendFormat": "query events",
           "refId": "A"
         }
@@ -221,6 +225,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -261,7 +266,7 @@
       "pluginVersion": "12.3.3",
       "targets": [
         {
-          "expr": "dns_activity_observer_upstream_events",
+          "expr": "prometheus_dns_activity_observer_upstream_events",
           "legendFormat": "upstream events",
           "refId": "A"
         }
@@ -292,6 +297,54 @@
           "color": {
             "mode": "palette-classic"
           },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "none"
         },
         "overrides": []
@@ -321,7 +374,7 @@
       "pluginVersion": "12.3.3",
       "targets": [
         {
-          "expr": "dns_activity_observer_top_query_count",
+          "expr": "prometheus_dns_activity_observer_top_query_count",
           "legendFormat": "#{{rank}} {{qname}} {{qtype}}",
           "refId": "A"
         }
@@ -338,6 +391,54 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           },
           "unit": "percentunit"
         },
@@ -368,7 +469,7 @@
       "pluginVersion": "12.3.3",
       "targets": [
         {
-          "expr": "dns_activity_observer_top_query_share",
+          "expr": "prometheus_dns_activity_observer_top_query_share",
           "legendFormat": "#{{rank}} {{qname}} {{qtype}}",
           "refId": "A"
         }
@@ -399,6 +500,54 @@
           "color": {
             "mode": "palette-classic"
           },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
           "unit": "none"
         },
         "overrides": []
@@ -428,7 +577,7 @@
       "pluginVersion": "12.3.3",
       "targets": [
         {
-          "expr": "dns_activity_observer_top_upstream_count",
+          "expr": "prometheus_dns_activity_observer_top_upstream_count",
           "legendFormat": "#{{rank}} {{upstream_name}} {{upstream_ip}}",
           "refId": "A"
         }
@@ -445,6 +594,54 @@
         "defaults": {
           "color": {
             "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           },
           "unit": "percentunit"
         },
@@ -475,7 +672,7 @@
       "pluginVersion": "12.3.3",
       "targets": [
         {
-          "expr": "dns_activity_observer_top_upstream_share",
+          "expr": "prometheus_dns_activity_observer_top_upstream_share",
           "legendFormat": "#{{rank}} {{upstream_name}} {{upstream_ip}}",
           "refId": "A"
         }
@@ -498,13 +695,12 @@
     "list": []
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "F - DNS Activity Observer",
   "uid": "phase3-dashboard-f",
-  "version": 1,
-  "weekStart": ""
+  "version": 2
 }
