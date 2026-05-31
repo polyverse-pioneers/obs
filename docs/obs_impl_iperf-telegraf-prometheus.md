@@ -1,13 +1,35 @@
-# Legacy Implementation Alias
+# Netspeed Implementation Log
 
-Status: Legacy alias
+Status: active
+Spec source: `docs/obs_spec_iperf-telegraf-prometheus.md`
 
-Canonical implementation log: [obs_impl_iperf-telegraf-prometheus.md](obs_impl_iperf-telegraf-prometheus.md)
+## Completed Work
 
-This file remains in place so repo workflows that still refer to
-`docs/build-impl.md` continue to resolve while the canonical name moves to the
-`obs_*` namespace.
+- Migrated probe execution from legacy HTTP speedtest approach to scheduled `iperf3` probing.
+- Rewrote `pip-speed-wrapper.sh` to emit Prometheus metrics directly.
+- Added endpoint-based metric labels and run-health metrics for observability.
+- Updated deployment flow to ship wrapper-only runtime artifacts.
+- Added dependency preflight checks (`iperf3`, `jq`) in deploy workflow.
+- Updated Telegraf configuration backups to use iperf3 endpoint list and runtime knobs.
+- Updated Dashboard C to focus on throughput, retransmits, and success outcomes.
+- Replaced Dashboard B with a DNS resolver operations dashboard backed by `unbound_*` and `dns_query_*` metrics.
+- Added backup workflow guidance and safe-by-default rsync process.
+- Added tracked Telegraf inputs for Unbound resolver stats and local DNS query health checks.
+- Added `/etc/unbound/` to the Planck backup inventory.
+- Standardized Grafana on the internal-only hostname `grafana.spinrikolab.home.arpa` behind nginx on Planck.
+- Updated Planck's Unbound private zones so Grafana resolves only through `spinrikolab.home.arpa` and no longer through the public-domain home zones.
+- Removed the public-domain Grafana reverse-proxy path so browser access no longer depends on HSTS-sensitive hostnames.
 
+## Operational Defaults
+
+- Probe interval: 15 minutes (Telegraf)
+- Typical duration: 30 seconds
+- Parallel streams: 4
+- Omit warm-up window: 2 seconds
+
+## Runtime Expectations
+
+- Wrapper remains backward-compatible with Telegraf `inputs.exec` and Prometheus text ingestion.
 - Failures are represented as metrics (`netspeed_run_success`, `netspeed_run_exit_code`) rather than silent drops.
 - DNS monitoring uses `inputs.unbound` for activity counters and `inputs.dns_query` for lightweight end-to-end resolver checks.
 - The preferred permission model is to add the `telegraf` user to the `unbound` group so `unbound-control` works without sudo.

@@ -1,0 +1,25 @@
+domain_prefix: obs
+repository_role: observability
+canonical_terms:
+  - obs_dashboard_network-health
+  - obs_service_telegraf
+  - obs_service_prometheus
+  - obs_service_grafana
+  - obs_probe_iperf3
+  - obs_dashboard_dns-resolver-operations
+  - obs_dashboard_isp-performance
+  - obs_dashboard_evidence-pack
+aliases:
+  netspeed: obs
+  monitoring: obs
+key_entities:
+  - planck
+  - grafana.spinrikolab.home.arpa
+  - telegraf
+  - prometheus
+  - grafana
+retirement_candidates:
+  - obs_dashboard_evidence-pack
+cross_repo_dependencies:
+  - dns
+  - ntwk

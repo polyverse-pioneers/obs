@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "name": "dns",
+      "path": "../../personal/dns"
+    },
+    {
+      "path": "../../personal/vpn"
+    },
+    {
+      "path": "../../../../mnt/c/code/personal/ntwk"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.venv": true
+    }
+  }
+}

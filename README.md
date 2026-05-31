@@ -62,6 +62,14 @@ Workflow reference:
 
 ## Docs
 
-- Spec: `docs/build.md`
-- Implementation log: `docs/build-impl.md`
+- Canonical spec: `docs/obs_spec_iperf-telegraf-prometheus.md`
+- Canonical implementation log: `docs/obs_impl_iperf-telegraf-prometheus.md`
+- Inventory index: `inventory/INDEX.md`
+- Dashboard index: `docs/obs_dashboard_index.md`
+- Dashboard implementation summary: `docs/obs_dashboard_phase3-implementation-complete.md`
+- Evidence-pack guidance: `docs/obs_report_isp-throttling-evidence-pack.md`
+- Evidence-pack source artifact set currently remains at legacy filenames: `docs/isp-evidence-pack.qmd`, `docs/isp-evidence-pack.html`, `docs/isp-evidence-pack.pdf`
+- Legacy aliases kept for workflow compatibility: `docs/build.md`, `docs/build-impl.md`
+- Glossary: `docs/obs_glossary.md`
+- RAG manifest: `rag/manifest.yaml`
 - Repo workflow guidance: `.github/copilot-instructions.md`
