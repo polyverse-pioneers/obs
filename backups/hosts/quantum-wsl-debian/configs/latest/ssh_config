@@ -1,0 +1,22 @@
+Host planck-primary
+    HostName 192.168.40.10
+    User spinriko
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    PreferredAuthentications publickey
+    PubkeyAuthentication yes
+
+Host heisenberg-automation
+    HostName 192.168.99.1
+    User spinner
+    IdentityFile ~/.ssh/heisenberg_automation_key
+    IdentitiesOnly yes
+    PubkeyAuthentication yes
+    PreferredAuthentications publickey
+
+    HostKeyAlgorithms +ssh-rsa
+    PubkeyAcceptedAlgorithms +ssh-rsa
+    MACs hmac-sha1,hmac-md5
+    KexAlgorithms +diffie-hellman-group1-sha1
+
+    StrictHostKeyChecking accept-new
