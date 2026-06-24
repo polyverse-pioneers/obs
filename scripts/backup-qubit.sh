@@ -6,11 +6,17 @@ repo_root=$(cd "$(dirname "$0")/.." && pwd)
 config_dir="$repo_root/backups/hosts/qubit/configs/latest"
 snapshot_dir="$repo_root/backups/hosts/qubit/snapshots"
 timestamp=$(date +"%Y-%m-%d_%H%M%S")
-host="qubit"
+host="${QUBIT_HOST:-192.168.40.20}"
 ssh_key="${QUBIT_SSH_KEY:-$HOME/.ssh/wsl-qubit}"
 ssh_opts=(-i "$ssh_key" -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
 
 mkdir -p "$config_dir" "$snapshot_dir"
+
+if ! ssh "${ssh_opts[@]}" "$host" 'true' >/dev/null 2>&1; then
+  echo "error: unable to reach qubit host '$host' via SSH" >&2
+  echo "hint: set QUBIT_HOST (for example QUBIT_HOST=qubit or QUBIT_HOST=192.168.40.20)" >&2
+  exit 1
+fi
 
 # Pull selected config paths from qubit. Keep this list explicit and reviewable.
 rsync -av --mkpath \
