@@ -20,3 +20,17 @@ Host heisenberg-automation
     KexAlgorithms +diffie-hellman-group1-sha1
 
     StrictHostKeyChecking accept-new
+
+Host hadron
+    HostName hadron
+    IdentityFile ~/.ssh/hadron_key
+    IdentitiesOnly yes
+    PubkeyAuthentication yes
+    PreferredAuthentications publickey
+
+Host qubit
+    HostName qubit
+    IdentityFile ~/.ssh/wsl-qubit
+    IdentitiesOnly yes
+    PubkeyAuthentication yes
+    PreferredAuthentications publickey

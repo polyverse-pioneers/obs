@@ -1,0 +1,21 @@
+# quantum-wsl-debian system snapshot
+# generated: 2026-06-23T21:08:36-10:00
+
+## hostname
+quantum
+
+## kernel
+Linux quantum 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 GNU/Linux
+
+## ip -brief addr
+lo               UNKNOWN        127.0.0.1/8 10.255.255.254/32 ::1/128 
+eth0             UP             172.21.206.226/20 fe80::215:5dff:feb5:6653/64 
+
+## default route
+default via 172.21.192.1 dev eth0 proto kernel 
+
+## resolv.conf
+nameserver 192.168.99.40
+nameserver 1.1.1.1
+options timeout:1 attempts:2
+
