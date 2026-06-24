@@ -81,6 +81,10 @@ Workflow reference:
 
 - `backups/rsync.md`
 
+WSL local host backups for `quantum-wsl-debian` are captured with
+`./scripts/backup-quantum-wsl.sh`, including non-secret resolver and host files
+such as `/etc/wsl.conf` (when present) and `/etc/resolv.conf`.
+
 ## Docs
 
 - Canonical spec: `docs/obs_spec_iperf-telegraf-prometheus.md`

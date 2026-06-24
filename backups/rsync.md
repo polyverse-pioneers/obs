@@ -1,5 +1,9 @@
 # Planck backup sync workflow
 
+This runbook covers host backups pulled from `planck-primary` only.
+WSL local host backups for `quantum-wsl-debian` are handled separately by
+`./scripts/backup-quantum-wsl.sh`.
+
 ## 1) Preview changes (dry-run)
 
 ```bash
@@ -57,3 +61,23 @@ Only run this if you explicitly want stale mirrored files removed.
 ```bash
 rsync -avzn --delete --rsync-path='sudo rsync' --exclude=planck.list --exclude=rsync.md --exclude=.gitkeep --files-from=./backups/planck.list planck-primary:/ ./backups/
 ```
+
+## WSL local backup workflow (`quantum-wsl-debian`)
+
+Run this from repo root on WSL:
+
+```bash
+./scripts/backup-quantum-wsl.sh
+./scripts/backup-quantum-wsl.sh --git-commit
+./scripts/backup-quantum-wsl.sh --git-push
+```
+
+The script updates these tracked files under `backups/hosts/quantum-wsl-debian/configs/latest/`:
+
+- `wsl.conf` (when `/etc/wsl.conf` exists)
+- `resolv.conf`
+- `hosts`
+- `ssh_config` (when `~/.ssh/config` exists)
+
+It also writes a timestamped snapshot under
+`backups/hosts/quantum-wsl-debian/snapshots/`.
