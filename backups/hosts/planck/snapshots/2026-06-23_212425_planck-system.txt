@@ -1,0 +1,20 @@
+# planck system snapshot
+# generated: 2026-06-23T21:24:26-10:00
+
+## hostname
+planck
+
+## kernel
+Linux planck 6.12.47+rpt-rpi-v8 #1 SMP PREEMPT Debian 1:6.12.47-1+rpt1 (2025-09-16) aarch64 GNU/Linux
+
+## ip -brief addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0             UP             192.168.40.10/24 fe80::2fd7:7e04:3738:d83a/64 
+wlan0            DOWN           
+wg0              UNKNOWN        10.44.0.1/24 
+
+## default route
+default via 192.168.40.1 dev eth0 proto dhcp src 192.168.40.10 metric 100 
+
+## unbound status
+active

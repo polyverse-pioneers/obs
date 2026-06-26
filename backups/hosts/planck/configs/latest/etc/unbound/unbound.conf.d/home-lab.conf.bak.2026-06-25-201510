@@ -38,7 +38,6 @@ server:
   local-zone: "home.polyversepioneers.org." static
   local-data: "planck.home.polyversepioneers.org. 300 IN A 192.168.40.10"
   local-data: "qubit.home.polyversepioneers.org. 300 IN A 192.168.40.20"
-  local-data: "hadron.home.polyversepioneers.org. 300 IN A 192.168.99.20"
 
   local-zone: "home.polyversepioneers.com." static
 
