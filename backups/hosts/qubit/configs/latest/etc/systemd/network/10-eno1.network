@@ -1,0 +1,9 @@
+[Match]
+Name=eno1
+
+[Network]
+DHCP=yes
+
+[DHCP]
+UseDomains=yes
+

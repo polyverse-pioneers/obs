@@ -1,0 +1,24 @@
+# qubit system snapshot
+# generated: 2026-06-27T14:12:50-10:00
+
+## hostname
+qubit
+
+## kernel
+Linux qubit 6.12.94+deb13-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.12.94-1 (2026-06-20) x86_64 GNU/Linux
+
+## ip -brief addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eno1             UP             192.168.40.20/24 metric 1024 fe80::e6e7:49ff:fe43:f1b1/64 
+wlp0s20f3        DOWN           
+
+## default route
+default via 192.168.40.1 dev eno1 proto dhcp src 192.168.40.20 metric 1024 
+
+## systemd-networkd state
+enabled
+active
+
+## systemd-resolved state
+enabled
+active
