@@ -79,12 +79,15 @@ pull_paths=(
   etc/hosts
   etc/hostname
   etc/fstab
+  etc/unbound
+  etc/default/unbound
   etc/systemd/network
   etc/systemd/networkd.conf
   etc/systemd/resolved.conf
   etc/systemd/networkd.conf.d
   etc/systemd/resolved.conf.d
   etc/systemd/system/network-online.target.wants
+  etc/systemd/system/unbound.service.d
   etc/systemd/system/systemd-networkd.service.wants
   etc/systemd/system/systemd-resolved.service.wants
   etc/network/interfaces.bak
@@ -102,12 +105,15 @@ if ssh "${ssh_opts[@]}" "$host" 'command -v rsync >/dev/null 2>&1'; then
     "$host":/etc/hosts \
     "$host":/etc/hostname \
     "$host":/etc/fstab \
+    "$host":/etc/unbound/ \
+    "$host":/etc/default/unbound \
     "$host":/etc/systemd/network/ \
     "$host":/etc/systemd/networkd.conf \
     "$host":/etc/systemd/resolved.conf \
     "$host":/etc/systemd/networkd.conf.d/ \
     "$host":/etc/systemd/resolved.conf.d/ \
     "$host":/etc/systemd/system/network-online.target.wants/ \
+    "$host":/etc/systemd/system/unbound.service.d/ \
     "$host":/etc/systemd/system/systemd-networkd.service.wants/ \
     "$host":/etc/systemd/system/systemd-resolved.service.wants/ \
     "$host":/etc/network/interfaces.bak \

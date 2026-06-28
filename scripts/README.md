@@ -41,6 +41,8 @@ Notes:
 - Optionally set `HADRON_SSH_KEY=/path/to/key` if host alias key routing is not available.
 - `backup-hadron.sh` and `backup-qubit.sh` prioritize active
   `systemd-networkd`/`systemd-resolved` config paths.
+- `backup-hadron.sh` also captures Unbound config and service drop-ins
+  (`/etc/unbound`, `/etc/default/unbound`, `/etc/systemd/system/unbound.service.d`).
 - Legacy `ifupdown` and `NetworkManager` artifacts are captured only from
   `.bak` paths when present.
 - `backup-qubit.sh` uses key `~/.ssh/wsl-qubit` by default.
