@@ -1,0 +1,46 @@
+# hadron system snapshot
+# generated: 2026-10-08T11:29:26-10:00
+
+## hostname
+hadron
+
+## os-release
+PRETTY_NAME="Debian GNU/Linux 13 (trixie)"
+NAME="Debian GNU/Linux"
+VERSION_ID="13"
+VERSION="13 (trixie)"
+VERSION_CODENAME=trixie
+DEBIAN_VERSION_FULL=13.5
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+
+## kernel
+Linux hadron 6.12.94+deb13-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.12.94-1 (2026-06-20) x86_64 GNU/Linux
+
+## ip -brief addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128
+eno1             UP             192.168.99.20/24 metric 1024 fe80::a248:1cff:feeb:3971/64
+wlo1             DOWN
+flannel.1        UNKNOWN        10.42.0.0/32 fe80::50e7:82ff:fe14:8c86/64
+cni0             UP             10.42.0.1/24 fe80::10d1:e3ff:fe70:2838/64
+veth57252c66@if2 UP             fe80::2875:8cff:fec5:e9c4/64
+veth04a1fa32@if2 UP             fe80::c085:43ff:fee0:9602/64
+vethb2adc339@if2 UP             fe80::d45f:7ff:fe82:c275/64
+veth0c510414@if2 UP             fe80::c0e0:9bff:fe41:fb60/64
+vethf33123c2@if2 UP             fe80::fcbd:c1ff:fee9:c184/64
+veth9fbc6884@if2 UP             fe80::4839:33ff:fe49:2f10/64
+veth7108549e@if2 UP             fe80::283b:2cff:fea2:75c4/64
+veth406c72e5@if2 UP             fe80::e898:10ff:fe7b:8afe/64
+
+## default route
+default via 192.168.99.1 dev eno1 proto dhcp src 192.168.99.20 metric 1024
+
+## systemd-networkd state
+enabled
+active
+
+## systemd-resolved state
+enabled
+active
